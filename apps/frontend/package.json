@@ -1,0 +1,21 @@
+{
+  "name": "@org/frontend",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "name": "frontend"
+  },
+  "dependencies": {
+    "@auth0/nextjs-auth0": "^4.21.0",
+    "next": "~16.1.6",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-markdown": "^10.1.0",
+    "react-plaid-link": "^4.1.1",
+    "recharts": "^3.8.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/typography": "^0.5.19",
+    "@types/recharts": "^1.8.29"
+  }
+}

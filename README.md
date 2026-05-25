@@ -1,105 +1,107 @@
-# New Nx Repository
+# FinanceAI
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+A personal finance dashboard with AI-powered insights, Plaid bank integrations, and budget tracking.
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is ready ✨.
+## Stack
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/nx-api/js?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
-## Try the full Nx platform
-🚀 If you haven't connected to Nx Cloud yet, [complete your setup here](https://cloud.nx.app/setup/connect-workspace/guide). Get faster builds with remote caching, distributed task execution, and self-healing CI. [See how your workspace can benefit](#nx-cloud).
-## Generate a library
+| Layer | Technology |
+|-------|-----------|
+| Frontend | Next.js 16 (App Router), Tailwind CSS, Recharts |
+| Backend | ASP.NET Core (.NET 10), Entity Framework Core |
+| Database | PostgreSQL 16 + pgvector |
+| Auth | Auth0 (`@auth0/nextjs-auth0` v4) |
+| Bank data | Plaid (Sandbox) |
+| AI | Azure OpenAI (streaming insights) |
+| Monorepo | Nx |
 
-```sh
-npx nx g @nx/js:lib packages/pkg1 --publishable --importPath=@my-org/pkg1
+## Prerequisites
+
+- Node.js 20+
+- .NET 10 SDK
+- Docker (for Postgres)
+- Auth0 tenant
+- Plaid developer account
+- Azure OpenAI resource
+
+## Getting started
+
+**1. Start the database**
+
+```bash
+docker compose up -d
 ```
 
-## Run tasks
+**2. Install dependencies**
 
-To build the library use:
-
-```sh
-npx nx build pkg1
+```bash
+npm install
 ```
 
-To run any task with Nx use:
+**3. Configure environment variables**
 
-```sh
-npx nx <target> <project-name>
+Frontend — `apps/frontend/.env.local`:
+
+```env
+AUTH0_SECRET=<random 32+ char secret>
+AUTH0_DOMAIN=<your-tenant>.auth0.com
+AUTH0_CLIENT_ID=<client id>
+CLIENT_SECRET=<client secret>
+APP_BASE_URL=http://localhost:3000
+AUTH0_AUDIENCE=<your api audience>
 ```
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+Backend — `apps/backend/appsettings.Development.json`:
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Versioning and releasing
-
-To version and release the library use
-
-```
-npx nx release
-```
-
-Pass `--dry-run` to see what would happen without actually releasing the library.
-
-[Learn more about Nx release &raquo;](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Keep TypeScript project references up to date
-
-Nx automatically updates TypeScript [project references](https://www.typescriptlang.org/docs/handbook/project-references.html) in `tsconfig.json` files to ensure they remain accurate based on your project dependencies (`import` or `require` statements). This sync is automatically done when running tasks such as `build` or `typecheck`, which require updated references to function correctly.
-
-To manually trigger the process to sync the project graph dependencies information to the TypeScript project references, run the following command:
-
-```sh
-npx nx sync
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Host=localhost;Database=financeai;Username=financeai;Password=financeai_dev"
+  },
+  "Auth0": {
+    "Domain": "<your-tenant>.auth0.com",
+    "Audience": "<your api audience>"
+  },
+  "Plaid": {
+    "ClientId": "<plaid client id>",
+    "Secret": "<plaid sandbox secret>"
+  },
+  "AzureOpenAI": {
+    "Endpoint": "https://<resource>.openai.azure.com/",
+    "Key": "<api key>"
+  }
+}
 ```
 
-You can enforce that the TypeScript project references are always in the correct state when running in CI by adding a step to your CI job configuration that runs the following command:
+**4. Run database migrations**
 
-```sh
-npx nx sync:check
+```bash
+cd apps/backend && dotnet ef database update
 ```
 
-[Learn more about nx sync](https://nx.dev/reference/nx-commands#sync)
+**5. Start both servers**
 
-## Nx Cloud
+```bash
+# Backend (http://localhost:5154)
+npx nx serve backend
 
-Nx Cloud ensures a [fast and scalable CI](https://nx.dev/ci/intro/why-nx-cloud?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) pipeline. It includes features such as:
-
-- [Remote caching](https://nx.dev/ci/features/remote-cache?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task distribution across multiple machines](https://nx.dev/ci/features/distribute-task-execution?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Automated e2e test splitting](https://nx.dev/ci/features/split-e2e-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task flakiness detection and rerunning](https://nx.dev/ci/features/flaky-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-### Set up CI (non-Github Actions CI)
-
-**Note:** This is only required if your CI provider is not GitHub Actions.
-
-Use the following command to configure a CI workflow for your workspace:
-
-```sh
-npx nx g ci-workflow
+# Frontend (http://localhost:3000)
+npx nx serve frontend
 ```
 
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+Or run both in parallel:
 
-## Install Nx Console
+```bash
+npx nx run-many -t serve -p frontend backend
+```
 
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
+## Features
 
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+- **Dashboard** — spending overview and category breakdown charts
+- **Transactions** — paginated transaction history with category labels
+- **AI Insights** — streaming AI-generated analysis of spending patterns (Azure OpenAI)
+- **Budgets** — budget creation and tracking per category
+- **Plaid integration** — connect bank accounts via Plaid Link
 
-## Useful links
+## API
 
-Learn more:
-
-- [Learn more about this workspace setup](https://nx.dev/nx-api/js?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-And join the Nx community:
-
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+Swagger UI is available at `http://localhost:5154/swagger` when running in development.

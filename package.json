@@ -2,20 +2,42 @@
   "name": "@org/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "dev": "nx run-many --target=serve --projects=frontend --parallel",
+    "dev:backend": "cd apps/backend $$ dotnet run",
+    "dev:all": "concurrently \"npm run dev\" \"npm run dev:backend\""
+  },
   "private": true,
-  "dependencies": {},
   "devDependencies": {
-    "@nx/js": "22.7.2",
+    "@nx/devkit": "22.7.3",
+    "@nx/js": "^22.7.3",
+    "@nx/next": "^22.7.3",
+    "@nx/playwright": "22.7.3",
+    "@playwright/test": "^1.36.0",
     "@swc-node/register": "1.11.1",
+    "@swc/cli": "~0.8.0",
     "@swc/core": "1.15.8",
     "@swc/helpers": "0.5.18",
+    "@types/node": "20.19.9",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "autoprefixer": "10.4.13",
+    "concurrently": "9.2.1",
     "nx": "22.7.2",
+    "postcss": "8.4.38",
     "prettier": "^3.8.1",
+    "tailwindcss": "3.4.3",
     "tslib": "^2.3.0",
     "typescript": "~5.9.2"
   },
   "workspaces": [
-    "packages/*"
-  ]
+    "packages/*",
+    "apps/*",
+    "libs/*"
+  ],
+  "dependencies": {
+    "next": "~16.1.6",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
 }

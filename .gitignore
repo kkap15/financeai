@@ -19,7 +19,6 @@ node_modules
 
 # IDE - VSCode
 .vscode/*
-!.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
@@ -38,12 +37,38 @@ testem.log
 .DS_Store
 Thumbs.db
 
+# Nx
 .nx/cache
 .nx/workspace-data
+.nx/polygraph
+.nx/self-healing
 .cursor/rules/nx-rules.mdc
 .github/instructions/nx.instructions.md
 
+# Claude
 .claude/worktrees
 .claude/settings.local.json
-.nx/polygraph
-.nx/self-healing
+
+# Next.js
+.next
+out
+test-output
+
+# Environment files
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+
+# .NET build artifacts
+bin/
+obj/
+*.user
+*.suo
+.vs/
+
+# ASP.NET secrets
+appsettings.Development.json
+*.pfx
+*.p12
