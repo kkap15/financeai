@@ -1,6 +1,5 @@
 'use client'
 
-import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 const INACTIVE_TIMEOUT = 10 * 60 * 1000;
@@ -11,7 +10,6 @@ const CHANNEL_NAME= 'financeai_activity';
 const LAST_ACTIVITY_KEY = 'financeai_last_activity';
 
 export function useInactivityLogout() {
-    const router = useRouter();
     const [showBanner, setShowBanner] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const bannerTimer = useRef<NodeJS.Timeout | undefined>(undefined);

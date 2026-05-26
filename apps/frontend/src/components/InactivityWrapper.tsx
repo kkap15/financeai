@@ -12,7 +12,6 @@ export default function InactivityWrapper({
 }) {
     const {showBanner, showModal, stayLoggedIn} = useInactivityLogout();
 
-    console.log('render - showBanner:', showBanner, 'showModal:', showModal);
     return(
         <>
             {showBanner && !showModal && (
