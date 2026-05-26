@@ -3,12 +3,15 @@ using Azure;
 using Azure.AI.OpenAI;
 using FinanceAI.Api.Data;
 using FinanceAI.Api.Modules.AI;
+using FinanceAI.Api.Modules.Chat.Services;
+using FinanceAI.Api.Modules.Chat.Tools;
 using FinanceAI.Api.Modules.Plaid;
 using FinanceAI.Api.Modules.Users;
 using Going.Plaid;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.SemanticKernel;
 using Environment = Going.Plaid.Environment;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -41,6 +44,8 @@ builder.Services.AddSingleton<AzureOpenAIClient>(options =>
 });
 builder.Services.AddScoped<AIService>();
 builder.Services.AddScoped<PlaidService>();
+builder.Services.AddScoped<FinanceTools>();
+builder.Services.AddScoped<AgentService>();
 
 var domain = builder.Configuration["Auth0:Domain"];
 var audience = builder.Configuration["Auth0:Audience"];
@@ -60,6 +65,23 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             NameClaimType = "sub"
         };
     });
+
+builder.Services.AddScoped<Kernel>(options =>
+{
+    var endpoint = builder.Configuration["AzureOpenAI:Endpoint"]!;
+    var key = builder.Configuration["AzureOpenAI:Key"]!;
+    var deployment = builder.Configuration["AzureOpenAI:DeploymentName"]!;
+
+    var kernel = Kernel.CreateBuilder()
+        .AddAzureOpenAIChatCompletion(deployment, endpoint, key)
+        .Build();
+
+    var financialTools = options.GetRequiredService<FinanceTools>();
+    kernel.Plugins.AddFromObject(financialTools, "FinanceTools");
+
+    return kernel;
+});
+
 builder.Services.AddAuthorization();
 
 builder.Services.AddCors(options =>

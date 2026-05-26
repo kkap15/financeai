@@ -6,7 +6,8 @@ const navLinks = [
     { href: '/dashboard', label: 'Dashboard' },
     { href: '/transactions', label: 'Transactions'},
     { href: '/insights', label: 'AI Insights' },
-    { href: '/budgets', label: 'Budgets' }
+    { href: '/budgets', label: 'Budgets' },
+    { href: '/chat', label: 'AI Chat' }
 ]
 
 export default function Navbar() {
@@ -41,7 +42,7 @@ export default function Navbar() {
 
                     {/* Logout */}
 
-                    <a href="/auth/logout"
+                    <a href="/logout"
                         className="text-sm text-gray-500 hover:text-gray-900"
                     >
                         Logout

@@ -13,11 +13,14 @@ export default function ConnectBankButton() {
     async function fetchLinkToken() {
         setLoading(true);
         const res = await fetch('/api/plaid/link-token', {method: 'POST'});
-        const data = await res.json();
+        const text = await res.text();
         if (!res.ok) {
-            const text = await res.text();
             console.error('.NET API Error', text);
+            setLoading(false);
+            return;
         }
+
+        const data = JSON.parse(text);
         setLinkToken(data.linkToken);
         setLoading(false);
     }

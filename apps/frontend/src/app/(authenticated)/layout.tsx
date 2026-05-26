@@ -1,3 +1,4 @@
+import InactivityWrapper from "@/components/InactivityWrapper";
 import Navbar from "@/components/Navbar";
 import { auth0 } from "@/lib/auth0"
 import { redirect } from "next/navigation";
@@ -14,9 +15,11 @@ export default async function AuthenticatedLayout ({
     return (
         <div className="min-h-screen bg-gray-50">
             <Navbar />
-            <div className="max-w-6xl mx-auto px-8 py-8">
-                {children}
-            </div>
+            <InactivityWrapper>
+                <div className="max-w-6xl mx-auto px-8 py-8">
+                    {children}
+                </div>
+            </InactivityWrapper>
         </div>
     )
 }
