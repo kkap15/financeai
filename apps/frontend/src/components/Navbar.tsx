@@ -51,7 +51,7 @@ export default function Navbar({
 
                     <div className="flex items-center gap-3">
                         {isPro && (
-                            <span className="bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs fonr-bold px-3 py-1 rounded-full">
+                            <span className="bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs font-bold px-3 py-1 rounded-full">
                                 PRO
                             </span>
                         )}

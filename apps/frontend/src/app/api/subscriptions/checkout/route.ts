@@ -8,7 +8,7 @@ export async function POST() {
         return NextResponse.json({error: 'Unauthorized'}, {status: 401 });
     }
 
-    const response = await fetch('http://localhost:5154/api/subscriptions/checkout', {
+    const response = await fetch(`${process.env.API_URL}/api/subscriptions/checkout`, {
         method: 'POST',
         headers: {
             Authorization: `Bearer ${session.tokenSet.accessToken}`

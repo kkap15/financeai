@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 
 
 async function getSubscription(accessToken:string) {
-    const res = await fetch('http://localhost:5154/api/user/subscription', {
+    const res = await fetch(`${process.env.API_URL}/api/user/subscription`, {
         headers: { Authorization: `Bearer ${accessToken}` },
         cache: 'no-store'
     });
@@ -25,7 +25,7 @@ export default async function AuthenticatedLayout ({
     
     if (!session) redirect('/auth/login');
 
-    await fetch('http://localhost:5154/api/user/me', {
+    await fetch(`${process.env.API_URL}/api/user/me`, {
         headers: { Authorization: `Bearer ${session.tokenSet.accessToken}`},
         cache: 'no-store'
     });

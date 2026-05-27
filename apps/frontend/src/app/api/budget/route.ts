@@ -7,7 +7,7 @@ export async function GET() {
         return NextResponse.json({error: 'Unauthorized'}, {status: 401});
     }
     
-    const response = await fetch('http://localhost:5154/api/budget', {
+    const response = await fetch(`${process.env.API_URL}/api/budget`, {
         headers: {
             Authorization: `Bearer ${session.tokenSet.accessToken}`,
         },
@@ -18,7 +18,7 @@ export async function GET() {
         const text = await response.json();
         return NextResponse.json({error: text }, {status: response.status})
     }
-    
+
     const data = await response.json();
     return NextResponse.json(data);
 }
@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const response = await fetch('http://localhost:5154/api/budget', {
+    const response = await fetch(`${process.env.API_URL}/api/budget`, {
         method: 'POST',
         headers: {
             Authorization: `Bearer ${session.tokenSet.accessToken}`,

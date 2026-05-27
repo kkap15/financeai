@@ -9,7 +9,7 @@ export async function POST(request: Request) {
     }
     
     const body = await request.json();
-    const response = await fetch('http://localhost:5154/api/plaid/exchange-token', {
+    const response = await fetch(`${process.env.API_URL}/api/plaid/exchange-token`, {
         method: 'POST',
         headers: {
             Authorization: `Bearer ${session.tokenSet.accessToken}`,

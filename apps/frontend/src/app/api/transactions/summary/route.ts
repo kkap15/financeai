@@ -7,7 +7,7 @@ export async function GET() {
         return NextResponse.json({error: 'Unauthorized'}, {status: 401});
     }
     
-    const response = await fetch('http://localhost:5154/api/transactions/summary', {
+    const response = await fetch(`${process.env.API_URL}/api/transactions/summary`, {
         headers: {
             Authorization: `Bearer ${session.tokenSet.accessToken}`
         }

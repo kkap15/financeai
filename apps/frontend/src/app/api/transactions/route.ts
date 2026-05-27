@@ -12,7 +12,7 @@ export async function GET(request: Request) {
     const page = searchParams.get('page') ?? '1';
     const category = searchParams.get('category') ?? '';
     
-    const url = new URL('http://localhost:5154/api/transactions');
+    const url = new URL(`${process.env.API_URL}/api/transactions`);
     url.searchParams.set('page', page);
     if (category) url.searchParams.set('category', category);
     

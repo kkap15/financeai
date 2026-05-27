@@ -1,10 +1,10 @@
 import CategoryChart from "@/components/Category/CategoryChart";
 import ConnectBankButton from "@/components/ConnectBankButton";
 import { auth0 } from "@/lib/auth0";
-import { Transaction } from "@org/shared-types"
+import { Transaction } from "../../../types/Transaction"
 
 async function getSummary(accessToken: string) {
-    const res = await fetch('http://localhost:5154/api/transactions/summary', {
+    const res = await fetch(`${process.env.API_URL}/api/transactions/summary`, {
         headers: {
             Authorization: `Bearer ${accessToken}`
         }
@@ -17,7 +17,7 @@ async function getSummary(accessToken: string) {
 }
 
 async function getRecentTransactions(accessToken:string) {
-    const url = new URL('http://localhost:5154/api/transactions')
+    const url = new URL(`${process.env.API_URL}/api/transactions`)
     url.searchParams.set('page', '1')
     url.searchParams.set('pageSize', '5')
 
@@ -38,6 +38,7 @@ export default async function DashboardPage({
   searchParams: Promise<{upgraded?: string}>
 }) {
     const session = await auth0.getSession();
+    console.log(session.tokenSet.accessToken);
     const { upgraded } = await searchParams;
 
     const [summary, recentTransactions] = await Promise.all([

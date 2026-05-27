@@ -8,7 +8,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const response = await fetch('http://localhost:5154/api/chat/agent', {
+    const response = await fetch(`${process.env.API_URL}/api/chat/agent`, {
         method: 'POST',
         headers: {
             Authorization: `Bearer ${session.tokenSet.accessToken}`,

@@ -7,7 +7,7 @@ export async function GET() {
         return new Response('Unauthorized', {status: 401});
     }
     
-    const response = await fetch('http://localhost:5154/api/ai/insights/stream', {
+    const response = await fetch(`${process.env.API_URL}/api/ai/insights/stream`, {
         headers: {
             Authorization: `Bearer ${session.tokenSet.accessToken}`
         }

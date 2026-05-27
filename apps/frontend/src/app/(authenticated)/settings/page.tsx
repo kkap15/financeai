@@ -6,7 +6,7 @@ export default async function SettingsPage() {
     const session = await auth0.getSession();
     const accessToken = session!.tokenSet.accessToken!
 
-    const response = await fetch('http://localhost:5154/api/user/subscription', {
+    const response = await fetch(`${process.env.API_URL}/api/user/subscription`, {
         headers: {
             Authorization: `Bearer ${accessToken}`,
             cache: 'no-store'

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Transaction } from '@org/shared-types'
+import { Transaction } from '../types/Transaction'
 
 export default function TransactionSearch() {
   const [query, setQuery] = useState('')

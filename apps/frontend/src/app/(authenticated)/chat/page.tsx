@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from "react";
-import { Message } from "@org/shared-types";
+import { Message } from "../../../types/Message";
 import ReactMarkdown from 'react-markdown';
 
 export default function ChatPage() {

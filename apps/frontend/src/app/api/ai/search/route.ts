@@ -9,7 +9,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const query = searchParams.get('query') ?? '';
     
-    const url = new URL('http://localhost:5154/api/ai/search');
+    const url = new URL(`${process.env.API_URL}/api/ai/search`);
     url.searchParams.set('query', query);
     
     const response = await fetch(url.toString(), {

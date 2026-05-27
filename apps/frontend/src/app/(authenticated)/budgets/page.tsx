@@ -1,10 +1,10 @@
 import BudgetForm from '@/components/BudgetForm';
 import { auth0 } from '@/lib/auth0';
-import {Budget} from '@org/shared-types'
+import {Budget} from '../../../types/Budget'
 
 async function getBudgets(accessToken: string): Promise<Budget[]> {
-    const response = await fetch('http://localhost:5154/api/budget', {
-        headers: {Authorization: `Bearer ${accessToken}`},
+    const response = await fetch(`${process.env.API_URL}/api/budget`, {
+    headers: {Authorization: `Bearer ${accessToken}`},
         cache: 'no-store'
     });
 

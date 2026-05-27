@@ -1,9 +1,9 @@
 import TransactionSearch from "@/components/TransactionSearch";
 import { auth0 } from "@/lib/auth0";
-import { Transaction } from "@org/shared-types"
+import { Transaction } from '../../../types/Transaction'
 
 async function getTransactions(accessToken: string, page: number) {
-    const url = new URL('http://localhost:5154/api/transactions');
+    const url = new URL(`${process.env.API_URL}/api/transactions`);
     url.searchParams.set('page', page.toString());
     url.searchParams.set('pageSize', '20');
     const response = await fetch(url.toString(), {
