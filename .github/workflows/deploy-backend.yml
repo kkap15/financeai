@@ -33,7 +33,7 @@ jobs:
       - name: Deploy to Container App
         run: |
           az containerapp update \
-            --name financeai-backend \
+            --name finance-backend \
             --resource-group financeai-rg \
             --image financeaiacr.azurecr.io/financeai-backend:latest \
             --set-env-vars \
