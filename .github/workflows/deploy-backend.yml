@@ -1,0 +1,53 @@
+name: Deploy Backend to Azure Container Apps
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/backend/**'
+      - '.github/workflows/deploy-backend.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Login to ACR
+        run: az acr login --name financeaiacr
+
+      - name: Build and push image
+        run: |
+          docker build \
+            -f apps/backend/Dockerfile \
+            -t financeaiacr.azurecr.io/financeai-backend:latest \
+            .
+          docker push financeaiacr.azurecr.io/financeai-backend:latest
+
+      - name: Deploy to Container App
+        run: |
+          az containerapp update \
+            --name financeai-backend \
+            --resource-group financeai-rg \
+            --image financeaiacr.azurecr.io/financeai-backend:latest \
+            --set-env-vars \
+              ASPNETCORE_ENVIRONMENT=Production \
+              Auth0__Domain="${{ secrets.AUTH0_DOMAIN }}" \
+              Auth0__Audience="${{ secrets.AUTH0_AUDIENCE }}" \
+              ConnectionStrings__DefaultConnection="${{ secrets.DB_CONNECTION_STRING }}" \
+              AzureOpenAI__Endpoint="${{ secrets.AZURE_OPENAI_ENDPOINT }}" \
+              AzureOpenAI__Key="${{ secrets.AZURE_OPENAI_KEY }}" \
+              AzureOpenAI__DeploymentName="${{ secrets.AZURE_OPENAI_DEPLOYMENT }}" \
+              AzureOpenAI__EmbeddingDeploymentName="${{ secrets.AZURE_OPENAI_EMBEDDING }}" \
+              Plaid__ClientId="${{ secrets.PLAID_CLIENT_ID }}" \
+              Plaid__Secret="${{ secrets.PLAID_SECRET }}" \
+              Plaid__Environment=sandbox \
+              Stripe__SecretKey="${{ secrets.STRIPE_SECRET_KEY }}" \
+              Stripe__PriceId="${{ secrets.STRIPE_PRICE_ID }}" \
+              Stripe__WebhookSecret="${{ secrets.STRIPE_WEBHOOK_SECRET }}"
