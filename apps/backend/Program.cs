@@ -92,8 +92,10 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("NextJs", policy => 
-        policy.WithOrigins("http://localhost:3000")
+    options.AddPolicy("NextJs", policy =>
+        policy.WithOrigins("http://localhost:3000", 
+                "https://financeai.moviegasm.xyz"
+            )
             .AllowAnyHeader()
             .AllowAnyMethod()
     );
