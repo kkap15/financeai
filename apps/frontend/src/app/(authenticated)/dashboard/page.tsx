@@ -1,5 +1,6 @@
 import CategoryChart from "@/components/Category/CategoryChart";
 import ConnectBankButton from "@/components/ConnectBankButton";
+import UpgradeBanner from "@/components/UpgradeBanner";
 import { auth0 } from "@/lib/auth0";
 import { Transaction } from "../../../types/Transaction"
 
@@ -48,17 +49,7 @@ export default async function DashboardPage({
 
     return(
         <div>
-          {upgraded === 'true' && (
-            <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4 mb-6 flex items-center gap-3">
-              <span className="text-2xl">🎉</span>
-            <div>
-              <p className="font-semibold text-green-500">Welcome to Pro!</p>
-              <p className="text-green-600 dark:text-green-400 text-sm">
-                You now have access to all Pro features.
-              </p>
-            </div>
-          </div>
-          )}
+          {upgraded === 'true' && <UpgradeBanner />}
           {/* Header */}
           <div className="flex justify-between items-center mb-8">
               <div>
