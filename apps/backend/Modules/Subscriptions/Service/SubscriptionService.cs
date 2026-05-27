@@ -10,11 +10,15 @@ public class SubscriptionService
 {
     private readonly IConfiguration _configuration;
     private readonly AppDbContext _context;
+    private readonly string _frontendBaseUrl;
 
-    public SubscriptionService(IConfiguration configuration, AppDbContext context)
+    public SubscriptionService(IConfiguration configuration, AppDbContext context, IWebHostEnvironment env)
     {
         _configuration = configuration;
         _context = context;
+        _frontendBaseUrl = env.IsProduction()
+            ? "https://financeai.moviegasm.xyz"
+            : "http://localhost:3000";
     }
     
     public async Task<string> CreateCheckoutSessionAsync(Guid userId, string userEmail)
@@ -59,8 +63,8 @@ public class SubscriptionService
                     Quantity = 1
                 }
             },
-            SuccessUrl = "http://localhost:3000/dashboard?upgraded=true",
-            CancelUrl = "http://localhost:3000/settings"
+            SuccessUrl = $"{_frontendBaseUrl}/dashboard?upgraded=true",
+            CancelUrl = $"{_frontendBaseUrl}/settings"
         });
         
         return session.Url;
@@ -80,7 +84,7 @@ public class SubscriptionService
         var options = new Stripe.BillingPortal.SessionCreateOptions
         {
             Customer = customerId,
-            ReturnUrl = "http://localhost:3000/dashboard"
+            ReturnUrl = $"{_frontendBaseUrl}/dashboard"
         };
         
         var service = new Stripe.BillingPortal.SessionService();
