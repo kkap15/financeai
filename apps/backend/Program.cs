@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Azure;
 using Azure.AI.OpenAI;
 using FinanceAI.Api.Data;
@@ -28,12 +29,18 @@ builder.Services.AddSwaggerGen();
 
 StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 var rawConnectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
-var connectionString = rawConnectionString;
+string connectionString;
 if (rawConnectionString.StartsWith("postgres://") || rawConnectionString.StartsWith("postgresql://"))
 {
     var uri = new Uri(rawConnectionString);
     var userInfo = uri.UserInfo.Split(':');
-    connectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true";
+    connectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};Username={Uri.UnescapeDataString(userInfo[0])};Password={Uri.UnescapeDataString(userInfo[1])};SSL Mode=Require;Trust Server Certificate=true";
+}
+else
+{
+    // Normalize libpq keywords Azure provides that Npgsql doesn't accept
+    connectionString = Regex.Replace(rawConnectionString, @"\buser\b\s*=", "Username=", RegexOptions.IgnoreCase);
+    connectionString = Regex.Replace(connectionString, @"\bdbname\b\s*=", "Database=", RegexOptions.IgnoreCase);
 }
 
 builder.Services.AddDbContext<AppDbContext>(options =>
