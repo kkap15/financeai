@@ -7,15 +7,15 @@ export default async function HomePage() {
   if (session) redirect('/dashboard')
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24">
+    <main className="flex min-h-screen flex-col items-center justify-center p-24 bg-white dark:bg-gray-950">
       <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">FinanceAI</h1>
-        <p className="text-gray-500 mb-8">
+        <h1 className="text-4xl font-bold mb-4 text-gray-900 dark:text-white">FinanceAI</h1>
+        <p className="text-gray-500 dark:text-gray-400 mb-8">
           AI-powered personal finance dashboard
         </p>
-        
+
         <a href="/auth/login"
-        className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600"
+        className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
         >
           Login
         </a>
