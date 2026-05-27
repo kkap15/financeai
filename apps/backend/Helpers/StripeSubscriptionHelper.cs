@@ -16,6 +16,20 @@ public static class StripeSubscriptionHelper
         var dbSubscription = await context.Subscriptions
             .FirstOrDefaultAsync(s => s.StripeCustomerId == subscription.CustomerId);
 
+        if (dbSubscription is null)
+        {
+            var customer = await new CustomerService().GetAsync(subscription.CustomerId);
+            if (customer.Metadata.TryGetValue("UserId", out var userIdStr) && Guid.TryParse(userIdStr, out var userId))
+            {
+                dbSubscription = await context.Subscriptions.FirstOrDefaultAsync(s => s.UserId == userId);
+                if (dbSubscription is not null)
+                {
+                    dbSubscription.StripeCustomerId = subscription.CustomerId;
+                    await context.SaveChangesAsync();
+                }
+            }
+        }
+
         return (subscription, dbSubscription);
     }
 

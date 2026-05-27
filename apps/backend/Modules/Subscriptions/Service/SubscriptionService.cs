@@ -47,8 +47,20 @@ public class SubscriptionService
         if (subscription is not null)
         {
             subscription.StripeCustomerId = customerId;
-            await _context.SaveChangesAsync();
         }
+        else
+        {
+            var newSubscription = new FinanceAI.Api.Models.Subscription
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                StripeCustomerId = customerId,
+                Tier = Enums.SubscriptionTier.Free,
+                Status = Enums.SubscriptionStatus.Active
+            };
+            await _context.Subscriptions.AddAsync(newSubscription);
+        }
+        await _context.SaveChangesAsync();
         
         var sessionService = new SessionService();
         var session = await sessionService.CreateAsync(new SessionCreateOptions
