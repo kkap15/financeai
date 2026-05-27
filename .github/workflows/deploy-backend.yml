@@ -26,8 +26,10 @@ jobs:
         run: |
           docker build \
             -f apps/backend/Dockerfile \
+            -t financeaiacr.azurecr.io/financeai-backend:${{ github.sha }} \
             -t financeaiacr.azurecr.io/financeai-backend:latest \
             .
+          docker push financeaiacr.azurecr.io/financeai-backend:${{ github.sha }}
           docker push financeaiacr.azurecr.io/financeai-backend:latest
 
       - name: Deploy to Container App
@@ -35,7 +37,7 @@ jobs:
           az containerapp update \
             --name financeai-backend \
             --resource-group financeai-rg \
-            --image financeaiacr.azurecr.io/financeai-backend:latest \
+            --image financeaiacr.azurecr.io/financeai-backend:${{ github.sha }} \
             --set-env-vars \
               ASPNETCORE_ENVIRONMENT=Production \
               Auth0__Domain="${{ secrets.AUTH0_DOMAIN }}" \
