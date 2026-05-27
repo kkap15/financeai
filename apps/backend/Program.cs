@@ -82,9 +82,6 @@ builder.Services.AddScoped<Kernel>(options =>
         .AddAzureOpenAIChatCompletion(deployment, endpoint, key)
         .Build();
 
-    var financialTools = options.GetRequiredService<FinanceTools>();
-    kernel.Plugins.AddFromObject(financialTools, "FinanceTools");
-
     return kernel;
 });
 

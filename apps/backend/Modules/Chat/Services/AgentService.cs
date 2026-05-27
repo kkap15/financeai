@@ -22,6 +22,9 @@ public class AgentService
         _financeTools.SetUserId(userId);
 
         var chatHistory = new ChatHistory();
+        
+        _kernel.Plugins.Clear();
+        _kernel.Plugins.AddFromObject(_financeTools, "FinanceTools");
 
         chatHistory.AddSystemMessage(
             """
