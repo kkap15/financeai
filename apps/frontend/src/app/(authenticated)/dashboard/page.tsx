@@ -63,19 +63,19 @@ export default async function DashboardPage({
               <>
                   {/* Summary Cards */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                      <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+                      <div className="bg-white dark:bg-gray-800 rounded-xl shadow dark:shadow-none dark:border dark:border-gray-700 p-6">
                           <p className="text-gray-500 dark:text-gray-400 text-sm mb-1">Total Spent</p>
                           <p className="text-3xl font-bold text-gray-900 dark:text-white">
                               ${summary.totalSpent.toFixed(2)}
                           </p>
                       </div>
-                      <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+                      <div className="bg-white dark:bg-gray-800 rounded-xl shadow dark:shadow-none dark:border dark:border-gray-700 p-6">
                           <p className="text-gray-500 dark:text-gray-400 text-sm mb-1">Total Income</p>
                           <p className="text-3xl font-bold text-green-600">
                               ${Math.abs(summary.totalIncome).toFixed(2)}
                           </p>
                       </div>
-                      <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+                      <div className="bg-white dark:bg-gray-800 rounded-xl shadow dark:shadow-none dark:border dark:border-gray-700 p-6">
                           <p className="text-gray-500 dark:text-gray-400 text-sm mb-1">Categories</p>
                           <p className="text-3xl font-bold text-gray-900 dark:text-white">
                               {summary.byCategory.length}
@@ -84,20 +84,20 @@ export default async function DashboardPage({
                   </div>
 
               {/* Chart */}
-                  <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6 mb-8">
+                  <div className="bg-white dark:bg-gray-800 rounded-xl shadow dark:shadow-none dark:border dark:border-gray-700 p-6 mb-8">
                       <h2 className="text-xl font-semibold mb-6 dark:text-white">Spending by Category</h2>
                       <CategoryChart data={summary.byCategory} />
                   </div>
               </>
     ) : (
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-12 text-center mb-8">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow dark:shadow-none dark:border dark:border-gray-700 p-12 text-center mb-8">
         <p className="text-gray-500 dark:text-gray-400 text-lg mb-4">No transactions yet</p>
         <ConnectBankButton />
       </div>
     )}
 
     {/* Recent Transactions */}
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow overflow-hidden">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow dark:shadow-none dark:border dark:border-gray-700 overflow-hidden">
       <div className="flex justify-between items-center p-6 border-b dark:border-gray-700">
         <h2 className="text-xl font-semibold dark:text-white">Recent Transactions</h2>
         <a href="/transactions" className="text-blue-500 text-sm hover:underline">
