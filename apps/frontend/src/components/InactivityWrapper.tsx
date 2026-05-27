@@ -12,7 +12,7 @@ export default function InactivityWrapper({
 }) {
     const {showBanner, showModal, stayLoggedIn} = useInactivityLogout();
 
-    return(
+    return (
         <>
             {showBanner && !showModal && (
                 <InactivityBanner onDismiss={stayLoggedIn} />

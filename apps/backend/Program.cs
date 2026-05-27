@@ -1,18 +1,20 @@
-using System.ClientModel;
 using Azure;
 using Azure.AI.OpenAI;
 using FinanceAI.Api.Data;
-using FinanceAI.Api.Modules.AI;
+using FinanceAI.Api.Modules.AI.Service;
+using FinanceAI.Api.Modules.Budget.Services;
 using FinanceAI.Api.Modules.Chat.Services;
 using FinanceAI.Api.Modules.Chat.Tools;
-using FinanceAI.Api.Modules.Plaid;
-using FinanceAI.Api.Modules.Users;
+using FinanceAI.Api.Modules.Plaid.Service;
+using FinanceAI.Api.Modules.Users.Service;
 using Going.Plaid;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.SemanticKernel;
+using Stripe;
 using Environment = Going.Plaid.Environment;
+using SubscriptionService = FinanceAI.Api.Modules.Subscriptions.Service.SubscriptionService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +25,8 @@ builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 builder.Services.AddDbContext<AppDbContext>(options => 
     options.UseNpgsql(
         builder.Configuration.GetConnectionString("DefaultConnection"),
@@ -46,6 +50,8 @@ builder.Services.AddScoped<AIService>();
 builder.Services.AddScoped<PlaidService>();
 builder.Services.AddScoped<FinanceTools>();
 builder.Services.AddScoped<AgentService>();
+builder.Services.AddScoped<SubscriptionService>();
+builder.Services.AddScoped<BudgetService>();
 
 var domain = builder.Configuration["Auth0:Domain"];
 var audience = builder.Configuration["Auth0:Audience"];

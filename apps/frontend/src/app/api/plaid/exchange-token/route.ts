@@ -19,7 +19,6 @@ export async function POST(request: Request) {
     });
     
     const data = await response.text();
-    console.log('.NET response status:')
     
     return NextResponse.json(data);
 }

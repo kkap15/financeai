@@ -28,7 +28,6 @@ export default function ConnectBankButton() {
     const handleSuccess = useCallback<PlaidLinkOnSuccess>(
         async(publicToken: string, metadata: PlaidLinkOnSuccessMetadata) => {
             const institutionName = metadata.institution?.name ?? 'Unknown Bank';
-            console.log(institutionName);
             await fetch('/api/plaid/exchange-token', {
                 method: 'POST',
                 headers: {

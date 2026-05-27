@@ -1,11 +1,12 @@
 using FinanceAI.Api.Data;
+using FinanceAI.Api.Helpers;
 using FinanceAI.Api.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace FinanceAI.Api.Modules.Transactions;
+namespace FinanceAI.Api.Modules.Transactions.Controller;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -23,10 +24,7 @@ public class TransactionsController : ControllerBase
     public async Task<IActionResult> GetAllTransactionsAsync([FromQuery] int page = 1, [FromQuery] int pageSize = 20,
         [FromQuery] string? category = null)
     {
-        var auth0Id = User.Claims.FirstOrDefault(x => x.Type == "sub")?.Value;
-        if (auth0Id is null) return Unauthorized();
-        
-        var user = await _context.Users.FirstOrDefaultAsync(x => x.Auth0Id == auth0Id);
+        var user = await ControllerHelper.GetCurrentUserAsync(User, _context);
         if (user is null) return Unauthorized();
 
         var query = _context.Transactions
@@ -67,11 +65,7 @@ public class TransactionsController : ControllerBase
     [HttpGet("summary")]
     public async Task<IActionResult> GetSummary()
     {
-        var auth0Id = User.Claims.FirstOrDefault(s => s.Type == "sub")?.Value;
-        if (auth0Id is null) return Unauthorized();
-        
-        var user = await _context.Users
-            .FirstOrDefaultAsync(x => x.Auth0Id == auth0Id);
+        var user = await ControllerHelper.GetCurrentUserAsync(User, _context);
         if (user is null) return Unauthorized();
         
         var thisMonth = DateOnly.FromDateTime(DateTime.UtcNow)
@@ -98,5 +92,20 @@ public class TransactionsController : ControllerBase
             totalIncome = transactions.Where(t => t.Amount < 0).Sum(t => t.Amount),
             byCategory = summary
         });
+    }
+
+    [HttpGet("categories")]
+    public async Task<IActionResult> GetTransactionCategoriesAsync()
+    {
+        var user = await ControllerHelper.GetCurrentUserAsync(User, _context);
+        if (user is null) return Unauthorized();
+        
+        var categories = await _context.Transactions
+            .Where(t => t.UserId == user.Id)
+            .Select(t => t.Category)
+            .Distinct()
+            .ToListAsync();
+        
+        return Ok(categories);
     }
 }

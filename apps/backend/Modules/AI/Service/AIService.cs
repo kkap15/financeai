@@ -6,7 +6,7 @@ using OpenAI.Chat;
 using Pgvector;
 using Pgvector.EntityFrameworkCore;
 
-namespace FinanceAI.Api.Modules.AI;
+namespace FinanceAI.Api.Modules.AI.Service;
 
 public class AIService
 {

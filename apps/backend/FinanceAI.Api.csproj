@@ -21,11 +21,8 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.1" />
     <PackageReference Include="Pgvector.EntityFrameworkCore" Version="0.3.0" />
     <PackageReference Include="Plaid.Net" Version="1.1.0.28592" />
+    <PackageReference Include="Stripe.net" Version="51.1.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.7" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Modules\Subscription\" />
   </ItemGroup>
 
 </Project>

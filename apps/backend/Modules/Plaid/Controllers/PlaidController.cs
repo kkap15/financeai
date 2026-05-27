@@ -1,10 +1,12 @@
 using FinanceAI.Api.Data;
+using FinanceAI.Api.Helpers;
+using FinanceAI.Api.Modules.Plaid.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace FinanceAI.Api.Modules.Plaid;
+namespace FinanceAI.Api.Modules.Plaid.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -25,26 +27,23 @@ public class PlaidController : ControllerBase
     [HttpPost("link-token")]
     public async Task<IActionResult> CreateLinkToken()
     {
-        var userId = await GetUserIdAsync();
-        if (userId is null)
-        {
-            return Unauthorized();
-        }
+        var user = await ControllerHelper.GetCurrentUserAsync(User, _context);
+        if (user is null) return Unauthorized();
         
-        var linkToken = await _plaidService.CreateLinkTokenAsync(userId.Value);
+        var linkToken = await _plaidService.CreateLinkTokenAsync(user.Id);
         return Ok(new {linkToken});
     }
 
     [HttpPost("exchange-token")]
     public async Task<IActionResult> ExchangeToken([FromBody] ExchangeTokenRequest request)
     {
-        var userId = await GetUserIdAsync();
-        if (userId is null) return Unauthorized();
+        var user = await ControllerHelper.GetCurrentUserAsync(User, _context);
+        if (user is null) return Unauthorized();
 
         try
         {
             var connection = await _plaidService.ExchangeTokenAsync(
-                userId.Value,
+                user.Id,
                 request.PublicToken,
                 request.InstitutionName);
 
@@ -65,11 +64,11 @@ public class PlaidController : ControllerBase
     [HttpGet("connections")]
     public async Task<IActionResult> GetConnections()
     {
-        var userId = await GetUserIdAsync();
-        if (userId is null) return Unauthorized();
+        var user = await ControllerHelper.GetCurrentUserAsync(User, _context);
+        if (user is null) return Unauthorized();
 
         var connections = await _context.PlaidConnections
-            .Where(r => r.UserId == userId.Value)
+            .Where(r => r.UserId == user.Id)
             .Select(x => new
             {
                 x.Id,
@@ -79,16 +78,6 @@ public class PlaidController : ControllerBase
             .ToListAsync();
         
         return Ok(connections);
-    }
-
-    private async Task<Guid?> GetUserIdAsync()
-    {
-        var auth0Id = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
-        if (auth0Id is null) return null;
-        
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.Auth0Id == auth0Id);
-        
-        return user?.Id;
     }
 }
 

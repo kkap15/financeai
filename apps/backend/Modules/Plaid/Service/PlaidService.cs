@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Pgvector;
 using Transaction = FinanceAI.Api.Models.Transaction;
 
-namespace FinanceAI.Api.Modules.Plaid;
+namespace FinanceAI.Api.Modules.Plaid.Service;
 
 public class PlaidService
 {
@@ -74,8 +74,8 @@ public class PlaidService
         await SyncTransactionsAsync(connection);
         return connection;
     }
-
-    public async Task SyncTransactionsAsync(PlaidConnection connection)
+    
+    private async Task SyncTransactionsAsync(PlaidConnection connection)
     {
         var request = new TransactionsSyncRequest
         {
@@ -97,10 +97,10 @@ public class PlaidService
                 Id = Guid.NewGuid(),
                 UserId = connection.UserId,
                 PlaidConnectionId = connection.Id,
-                Amount = (decimal)t.Amount,
+                Amount = (decimal)t.Amount!,
                 Category = t.PersonalFinanceCategory?.Primary ?? "Uncategorized",
                 Date = t.Date!.Value,
-                Description = t.Name,
+                Description = t.MerchantName!,
                 PlaidId = t.TransactionId!
             });
         }

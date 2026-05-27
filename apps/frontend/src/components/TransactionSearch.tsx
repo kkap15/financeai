@@ -21,16 +21,22 @@ export default function TransactionSearch() {
   }
 
   return (
-    <div className="bg-white rounded-xl shadow p-6 mb-8">
-      <h2 className="text-lg font-semibold mb-4">🔍 Smart Search</h2>
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6 mb-8">
+      <h2 className="text-lg text-white font-semibold mb-4">🔍 Smart Search</h2>
       <div className="flex gap-3">
         <input
           type="text"
           value={query}
-          onChange={e => setQuery(e.target.value)}
+          onChange={e => {
+            setQuery(e.target.value)
+            if (!e.target.value.trim()) {
+              setSearched(false);
+              setResults([]);
+            }
+          }}
           onKeyDown={e => e.key === 'Enter' && handleSearch()}
           placeholder='Try "coffee shops" or "subscriptions" or "food delivery"'
-          className="flex-1 border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex-1 border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
         />
         <button
           onClick={handleSearch}
@@ -44,20 +50,20 @@ export default function TransactionSearch() {
       {searched && (
         <div className="mt-4">
           {results.length === 0 ? (
-            <p className="text-gray-500 text-sm">No matching transactions found.</p>
+            <p className="text-gray-500 text-sm dark:text-gray-400">No matching transactions found.</p>
           ) : (
-            <div className="divide-y divide-gray-100">
+            <div className="divide-y divide-gray-100 dark:divide-gray-700">
               {results.map(t => (
                 <div key={t.id} className="py-3 flex justify-between items-center">
                   <div>
-                    <p className="font-medium text-sm">{t.description}</p>
-                    <p className="text-xs text-gray-500">
+                    <p className="font-medium text-sm dark:text-white">{t.description}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
                       {t.category.replace(/_/g, ' ')} ·{' '}
                       {new Date(t.date).toLocaleDateString('en-AU')}
                     </p>
                   </div>
                   <span className={`font-medium text-sm ${
-                    t.amount < 0 ? 'text-green-600' : 'text-gray-900'
+                    t.amount < 0 ? 'text-green-600' : 'text-gray-900 dark:text-white'
                   }`}>
                     {t.amount < 0 ? '+' : ''}${Math.abs(t.amount).toFixed(2)}
                   </span>

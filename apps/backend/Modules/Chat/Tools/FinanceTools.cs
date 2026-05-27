@@ -2,12 +2,10 @@ using System.ComponentModel;
 using System.Globalization;
 using Azure.AI.OpenAI;
 using FinanceAI.Api.Data;
-using FinanceAI.Api.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.SemanticKernel;
 using Pgvector;
 using Pgvector.EntityFrameworkCore;
-using Plaid.Net.Models;
 
 namespace FinanceAI.Api.Modules.Chat.Tools;
 
@@ -158,7 +156,7 @@ public class FinanceTools
 
         if (userHasBudget.Any())
         {
-            var budget = userHasBudget.FirstOrDefault();
+            var budget = userHasBudget.FirstOrDefault()!;
             budget.MonthlyLimit = limit;
             _context.Budgets.Update(budget);
             await _context.SaveChangesAsync();
@@ -167,7 +165,7 @@ public class FinanceTools
         }
         else
         {
-            var budget = new Budget
+            var budget = new Models.Budget
             {
                 Category = category,
                 Id = Guid.NewGuid(),

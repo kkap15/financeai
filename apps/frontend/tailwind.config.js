@@ -11,6 +11,7 @@
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: ['variant', '.dark &'],
   content: [
     './src/**/*.{ts,tsx}',
     //     ...createGlobPatternsForDependencies(__dirname)

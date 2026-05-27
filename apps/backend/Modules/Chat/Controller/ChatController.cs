@@ -1,12 +1,13 @@
 using System.Text.Json;
 using FinanceAI.Api.Data;
+using FinanceAI.Api.Helpers;
 using FinanceAI.Api.Modules.Chat.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace FinanceAI.Api.Modules.Chat;
+namespace FinanceAI.Api.Modules.Chat.Controller;
 
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 [ApiController]
@@ -16,27 +17,14 @@ public class ChatController(AgentService agentService, AppDbContext context) : C
     [HttpPost("agent")]
     public async Task AgentStream([FromBody] ChatRequest requestBody)
     {
-        var auth0Id = User.Claims.FirstOrDefault(x => x.Type == "sub")?.Value;
-        if (auth0Id is null)
-        {
-            Response.StatusCode = 401;
-            return;
-        }
-        
-        var user = await context.Users
-            .FirstOrDefaultAsync(x => x.Auth0Id == auth0Id);
-        if (user is null)
-        {
-            Response.StatusCode = 401;
-            return;
-        }
-        
+        var user = await ControllerHelper.GetCurrentUserAsync(User, context);
+        if (user is null) Response.StatusCode = 401;
         
         Response.ContentType = "text/event-stream";
         Response.Headers.CacheControl = "no-cache";
         Response.Headers.Connection = "keep-alive";
 
-        await foreach (var response in agentService.ChatAsync(user.Id, requestBody.Message,
+        await foreach (var response in agentService.ChatAsync(user!.Id, requestBody.Message,
                            requestBody.History))
         {
             var json = JsonSerializer.Serialize(new { text = response });

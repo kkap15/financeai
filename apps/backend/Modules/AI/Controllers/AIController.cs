@@ -1,11 +1,12 @@
 using System.Text.Json;
 using FinanceAI.Api.Data;
+using FinanceAI.Api.Helpers;
+using FinanceAI.Api.Modules.AI.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
-namespace FinanceAI.Api.Modules.AI;
+namespace FinanceAI.Api.Modules.AI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -24,26 +25,14 @@ public class AIController : ControllerBase
     [HttpGet("insights/stream")]
     public async Task StreamInsights()
     {
-        var auth0Id = User.Claims.FirstOrDefault(x => x.Type == "sub")?.Value;
-        if (auth0Id is null)
-        {
-            Response.StatusCode = 401;
-            return;
-        }
-        
-        var user = await _context.Users
-            .FirstOrDefaultAsync(x => x.Auth0Id == auth0Id);
-        if (user is null)
-        {
-            Response.StatusCode = 401;
-            return;
-        }
+        var user = await ControllerHelper.GetCurrentUserAsync(User, _context);
+        if (user is null) Response.StatusCode = 401;
         
         Response.ContentType = "text/event-stream";
         Response.Headers.CacheControl = "no-cache";
         Response.Headers.Connection = "keep-alive";
 
-        await foreach (var chunk in _aiService.GetSpendingInsightAsync(user.Id))
+        await foreach (var chunk in _aiService.GetSpendingInsightAsync(user!.Id))
         {
             var json = JsonSerializer.Serialize(new { text = chunk });
             await Response.WriteAsync($"data: {json}\n\n");
@@ -62,11 +51,7 @@ public class AIController : ControllerBase
             return BadRequest(new { error = "Query is required" });
         }
 
-        var auth0Id = User.Claims.FirstOrDefault(x => x.Type == "sub")?.Value;
-        if (auth0Id is null) return Unauthorized();
-
-        var user = await _context.Users
-            .FirstOrDefaultAsync(u => u.Auth0Id == auth0Id);
+        var user = await ControllerHelper.GetCurrentUserAsync(User, _context);
         if (user is null) return Unauthorized();
 
         var results = await _aiService.SemanticSearchAsync(user.Id, query);
