@@ -100,7 +100,7 @@ public class PlaidService
                 Amount = (decimal)t.Amount!,
                 Category = t.PersonalFinanceCategory?.Primary ?? "Uncategorized",
                 Date = t.Date!.Value,
-                Description = t.MerchantName!,
+                Description = t.MerchantName ?? "Unknown",
                 PlaidId = t.TransactionId!
             });
         }
