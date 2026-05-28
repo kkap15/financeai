@@ -44,7 +44,7 @@ export default function InsightsClient() {
 
     return (
         <div>
-            <div className="flex justify-between items-center mb-8">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
                 <div>
                     <h1 className="text-3xl font-bold dark:text-white">AI Insights</h1>
                     <p className="text-gray-500 dark:text-gray-400">
@@ -54,7 +54,7 @@ export default function InsightsClient() {
                 <button
                     onClick={getInsights}
                     disabled={loading}
-                    className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 disabled:opacity-50 flex items-center gap-2"
+                    className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 disabled:opacity-50 flex items-center justify-center gap-2 w-full sm:w-auto"
                 >
                     {loading ? (
                         <>

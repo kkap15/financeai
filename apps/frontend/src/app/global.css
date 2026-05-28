@@ -1,2 +1,10 @@
 @import "tailwindcss";
 @config "../../tailwind.config.js";
+
+html, body {
+  background-color: #f9fafb; /* gray-50 — matches authenticated layout light bg */
+}
+
+html.dark, html.dark body {
+  background-color: #111827; /* gray-900 — matches authenticated layout dark bg */
+}

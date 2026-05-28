@@ -37,19 +37,22 @@ export default async function BudgetPage() {
                 <ul className="space-y-4 mb-8">
                     {budgets.map((budget) => (
                         <li key={budget.category} className="bg-white rounded-xl shadow p-6 dark:bg-gray-800">
-                            <div className="flex justify-between items-center mb-2">
-                                <span className="font-medium text-gray-800 dark:text-white">
-                                    {budget.category.replace(/_/g, ' ')}
-                                </span>
+                            <div className="mb-2">
+                                <div className="flex justify-between items-center">
+                                    <span className="font-medium text-gray-800 dark:text-white">
+                                        {budget.category.replace(/_/g, ' ')}
+                                    </span>
+                                    <span className={`text-sm font-semibold ${
+                                        budget.percentage >= 100 ? 'text-red-500' :
+                                        budget.percentage >= 80 ? 'text-yellow-500' :
+                                        'text-blue-500'
+                                    }`}>
+                                        {budget.percentage}%
+                                    </span>
+                                </div>
                                 <span className="text-sm text-gray-500 dark:text-white">
                                     ${budget.spent.toFixed(2)} of ${budget.limit.toFixed(2)}
                                 </span>
-                                <span className={`text-sm font-semibold ${
-                                    budget.percentage >= 100 ? 'text-red-500' :
-                                    budget.percentage >= 80 ? 'text-yellow-500' :
-                                    'text-blue-500'
-                                }`}>
-                                    {budget.percentage}%</span>
                             </div>
                             <div className="w-full bg-gray-100 rounded-full h-2">
                                 <div 
