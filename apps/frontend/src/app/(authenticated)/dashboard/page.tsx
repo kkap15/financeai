@@ -108,16 +108,16 @@ export default async function DashboardPage({
         <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
           {recentTransactions.map((t: Transaction) => (
             <tr key={t.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-              <td className="p-4 font-medium dark:text-white">{t.description}</td>
-              <td className="p-4">
-                <span className="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs px-2 py-1 rounded-full">
+              <td className="p-3 sm:p-4 font-medium dark:text-white max-w-[100px] sm:max-w-none truncate">{t.description}</td>
+              <td className="p-3 sm:p-4">
+                <span className="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs px-2 py-1 rounded-full whitespace-nowrap">
                   {t.category.replace(/_/g, ' ')}
                 </span>
               </td>
-              <td className="p-4 text-gray-500 dark:text-gray-400 text-sm">
+              <td className="hidden sm:table-cell p-4 text-gray-500 dark:text-gray-400 text-sm">
                 {new Date(t.date).toLocaleDateString('en-AU')}
               </td>
-              <td className={`p-4 text-right font-medium ${
+              <td className={`p-3 sm:p-4 text-right font-medium whitespace-nowrap ${
                 t.amount < 0 ? 'text-green-600' : 'text-gray-900 dark:text-white'
               }`}>
                 {t.amount < 0 ? '+' : ''}${Math.abs(t.amount).toFixed(2)}

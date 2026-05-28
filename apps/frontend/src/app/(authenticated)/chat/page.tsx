@@ -63,7 +63,7 @@ export default function ChatPage() {
     }
 
     return (
-        <div className="flex flex-col h-[80vh]">
+        <div className="flex flex-col h-[calc(100dvh-10rem)] sm:h-[80vh]">
             { /* header   */}
             <div className="mb-6">
                 <h1 className="text-3xl font-bold dark:text-white">AI Finance Chat</h1>
@@ -71,7 +71,7 @@ export default function ChatPage() {
             </div>
 
             {/**  Messages */}
-            <div className="flex-1 overflow-y-auto bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 mb-4 space-y-4">
+            <div className="flex-1 overflow-y-auto bg-white dark:bg-gray-800 rounded-xl shadow-xl dark:shadow-none dark:border dark:border-gray-700 p-4 sm:p-6 mb-4 space-y-4">
                 {messages.length === 0 && (
                     <div className="text-center text-gray-400 dark:text-gray-500 mt-20">
                         <p className="text-4xl mb-4">💬</p>

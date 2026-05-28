@@ -33,34 +33,34 @@ export default async function TransactionsPage({
     const { transactions, total, totalPages } = await getTransactions(session!.tokenSet.accessToken!, page);
 
     return (
-        <main className="max-w-4xl mx-auto p8">
+        <main className="max-w-4xl mx-auto">
             <h1 className="text-3xl font-bold mb-2 dark:text-white">Transactions</h1>
-            <p className="text-gray-500 dark:text-gray-400 mb-8">{total} total transactions</p>
+            <p className="text-gray-500 dark:text-gray-400 mb-6">{total} total transactions</p>
 
-            <div>
+            <div className="bg-white dark:bg-gray-800 rounded-xl border dark:border-gray-700 overflow-hidden">
                 <TransactionSearch />
                 <table className="w-full">
                     <thead className="bg-gray-50 dark:bg-gray-700 border-b dark:border-gray-600">
                         <tr>
-                            <th className="text-left p-4 text-sm font-medium text-gray-500 dark:text-gray-400">Description</th>
-                            <th className="text-left p-4 text-sm font-medium text-gray-500 dark:text-gray-400">Category</th>
-                            <th className="text-left p-4 text-sm font-medium text-gray-500 dark:text-gray-400">Date</th>
-                            <th className="text-left p-4 text-sm font-medium text-gray-500 dark:text-gray-400">Amount</th>
+                            <th className="text-left p-3 sm:p-4 text-sm font-medium text-gray-500 dark:text-gray-400">Description</th>
+                            <th className="text-left p-3 sm:p-4 text-sm font-medium text-gray-500 dark:text-gray-400">Category</th>
+                            <th className="hidden sm:table-cell text-left p-4 text-sm font-medium text-gray-500 dark:text-gray-400">Date</th>
+                            <th className="text-right p-3 sm:p-4 text-sm font-medium text-gray-500 dark:text-gray-400">Amount</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                         {transactions.map((t: Transaction) => (
                             <tr key={t.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                                <td className="p-4 font-medium dark:text-white">{t.description}</td>
-                                <td className="p-4">
-                                    <span className="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs px-2 py-1 rounded-full">
+                                <td className="p-3 sm:p-4 font-medium dark:text-white max-w-[100px] sm:max-w-none truncate">{t.description}</td>
+                                <td className="p-3 sm:p-4">
+                                    <span className="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs px-2 py-1 rounded-full whitespace-nowrap">
                                         {t.category.replace(/_/g, ' ')}
                                     </span>
                                 </td>
-                                <td className="p-4 text-gray-500 dark:text-gray-400 text-sm">
+                                <td className="hidden sm:table-cell p-4 text-gray-500 dark:text-gray-400 text-sm">
                                     {new Date(t.date).toLocaleDateString('en-AU')}
                                 </td>
-                                <td className={`p-4 text-right font-medium ${
+                                <td className={`p-3 sm:p-4 text-right font-medium whitespace-nowrap ${
                                     t.amount < 0 ? 'text-green-600' : 'text-gray-900 dark:text-white'
                                 }`}>
                                     {t.amount < 0 ? '+' : ''}${Math.abs(t.amount).toFixed(2)}

@@ -28,7 +28,11 @@ export default function CategoryChart({ data } : { data : CategoryData[] }) {
                     tickFormatter={(v) => `$${v}`}
                     tick={{ fontSize: 12 }}
                 />
-                <Tooltip formatter={(value) => [`$${value}`, 'Spent']} />
+                <Tooltip
+                    formatter={(value) => [`$${value}`, 'Spent']}
+                    contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '8px', color: '#f1f5f9' }}
+                    labelStyle={{ color: '#94a3b8' }}
+                />
                 <Bar dataKey="amount" fill="#3b82f6" radius={[ 4, 4, 0, 0 ]} />
             </BarChart>
         </ResponsiveContainer>
