@@ -9,8 +9,8 @@ export default async function SettingsPage() {
     const response = await fetch(`${process.env.API_URL}/api/user/subscription`, {
         headers: {
             Authorization: `Bearer ${accessToken}`,
-            cache: 'no-store'
-        }
+        },
+        cache: 'no-store'
     })
     
     const subscription = await response.json();
