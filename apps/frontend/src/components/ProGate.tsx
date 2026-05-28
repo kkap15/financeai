@@ -11,7 +11,7 @@ export default function ProGate() {
                 </p>
                 <Link 
                 href="/settings"
-                className="bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold px-8 py-3 rounded-full hover:opacity-90 transition inline-block"
+                className="bg-linear-to-r from-blue-500 to-purple-500 text-white font-bold px-8 py-3 rounded-full hover:opacity-90 transition inline-block"
                 >
                     Upgrade to Pro
                 </Link>   

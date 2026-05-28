@@ -10,6 +10,7 @@ export default async function HomePage() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { background: #080C14; }
         :root {
           --bg: #080C14; --bg2: #0D1320; --bg3: #111827;
           --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.12);
@@ -55,6 +56,7 @@ export default async function HomePage() {
           .pricing-grid { grid-template-columns: 1fr; }
           nav { padding: 1rem 1.5rem; }
           .nav-links a:not(.nav-cta) { display: none; }
+          .hero { padding: 3rem 1.5rem 4rem; }
           .stats { gap: 1.5rem; }
           footer { padding: 2rem 1.5rem; }
         }
