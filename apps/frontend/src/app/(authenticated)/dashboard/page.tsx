@@ -48,6 +48,7 @@ export default async function DashboardPage({
     ]);
 
     return(
+      <main style={{background:'#1e2939'}}>
         <div>
           {upgraded === 'true' && <UpgradeBanner />}
           {/* Header */}
@@ -61,72 +62,73 @@ export default async function DashboardPage({
 
           {summary ? (
               <>
-                  {/* Summary Cards */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                      <div className="bg-white dark:bg-gray-800 rounded-xl shadow dark:shadow-none dark:border dark:border-gray-700 p-6">
-                          <p className="text-gray-500 dark:text-gray-400 text-sm mb-1">Total Spent</p>
-                          <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                              ${summary.totalSpent.toFixed(2)}
-                          </p>
-                      </div>
-                      <div className="bg-white dark:bg-gray-800 rounded-xl shadow dark:shadow-none dark:border dark:border-gray-700 p-6">
-                          <p className="text-gray-500 dark:text-gray-400 text-sm mb-1">Total Income</p>
-                          <p className="text-3xl font-bold text-green-600">
-                              ${Math.abs(summary.totalIncome).toFixed(2)}
-                          </p>
-                      </div>
-                      <div className="bg-white dark:bg-gray-800 rounded-xl shadow dark:shadow-none dark:border dark:border-gray-700 p-6">
-                          <p className="text-gray-500 dark:text-gray-400 text-sm mb-1">Categories</p>
-                          <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                              {summary.byCategory.length}
-                          </p>
-                      </div>
+                {/* Summary Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                  <div className="bg-white dark:bg-gray-800 rounded-xl shadow dark:shadow-none dark:border dark:border-gray-700 p-6">
+                    <p className="text-gray-500 dark:text-gray-400 text-sm mb-1">Total Spent</p>
+                    <p className="text-3xl font-bold text-gray-900 dark:text-white">
+                      ${summary.totalSpent.toFixed(2)}
+                    </p>
                   </div>
+                  <div className="bg-white dark:bg-gray-800 rounded-xl shadow dark:shadow-none dark:border dark:border-gray-700 p-6">
+                    <p className="text-gray-500 dark:text-gray-400 text-sm mb-1">Total Income</p>
+                    <p className="text-3xl font-bold text-green-600">
+                      ${Math.abs(summary.totalIncome).toFixed(2)}
+                    </p>
+                  </div>
+                  <div className="bg-white dark:bg-gray-800 rounded-xl shadow dark:shadow-none dark:border dark:border-gray-700 p-6">
+                    <p className="text-gray-500 dark:text-gray-400 text-sm mb-1">Categories</p>
+                    <p className="text-3xl font-bold text-gray-900 dark:text-white">
+                      {summary.byCategory.length}
+                    </p>
+                  </div>
+                </div>
 
-              {/* Chart */}
-                  <div className="bg-white dark:bg-gray-800 rounded-xl shadow dark:shadow-none dark:border dark:border-gray-700 p-6 mb-8">
-                      <h2 className="text-xl font-semibold mb-6 dark:text-white">Spending by Category</h2>
-                      <CategoryChart data={summary.byCategory} />
-                  </div>
+                  {/* Chart */}
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow dark:shadow-none dark:border dark:border-gray-700 p-6 mb-8">
+                  <h2 className="text-xl font-semibold mb-6 dark:text-white">Spending by Category</h2>
+                    <CategoryChart data={summary.byCategory} />
+                </div>
               </>
-    ) : (
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow dark:shadow-none dark:border dark:border-gray-700 p-12 text-center mb-8">
-        <p className="text-gray-500 dark:text-gray-400 text-lg mb-4">No transactions yet</p>
-        <ConnectBankButton />
-      </div>
-    )}
+          ) : (
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow dark:shadow-none dark:border dark:border-gray-700 p-12 text-center mb-8">
+              <p className="text-gray-500 dark:text-gray-400 text-lg mb-4">No transactions yet</p>
+              <ConnectBankButton />
+            </div>
+          )}
 
-    {/* Recent Transactions */}
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow dark:shadow-none dark:border dark:border-gray-700 overflow-hidden">
-      <div className="flex justify-between items-center p-6 border-b dark:border-gray-700">
-        <h2 className="text-xl font-semibold dark:text-white">Recent Transactions</h2>
-        <a href="/transactions" className="text-blue-500 text-sm hover:underline">
-          View all →
-        </a>
-      </div>
-      <table className="w-full">
-        <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-          {recentTransactions.map((t: Transaction) => (
-            <tr key={t.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-              <td className="p-3 sm:p-4 font-medium dark:text-white max-w-[100px] sm:max-w-none truncate">{t.description}</td>
-              <td className="p-3 sm:p-4">
-                <span className="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs px-2 py-1 rounded-full whitespace-nowrap">
-                  {t.category.replace(/_/g, ' ')}
-                </span>
-              </td>
-              <td className="hidden sm:table-cell p-4 text-gray-500 dark:text-gray-400 text-sm">
-                {new Date(t.date).toLocaleDateString('en-AU')}
-              </td>
-              <td className={`p-3 sm:p-4 text-right font-medium whitespace-nowrap ${
-                t.amount < 0 ? 'text-green-600' : 'text-gray-900 dark:text-white'
-              }`}>
-                {t.amount < 0 ? '+' : ''}${Math.abs(t.amount).toFixed(2)}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  </div>
-  )
+          {/* Recent Transactions */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow dark:shadow-none dark:border dark:border-gray-700 overflow-hidden">
+            <div className="flex justify-between items-center p-6 border-b dark:border-gray-700">
+              <h2 className="text-xl font-semibold dark:text-white">Recent Transactions</h2>
+              <a href="/transactions" className="text-blue-500 text-sm hover:underline">
+                View all →
+              </a>
+            </div>
+            <table className="w-full">
+              <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+                {recentTransactions.map((t: Transaction) => (
+                  <tr key={t.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <td className="p-3 sm:p-4 font-medium dark:text-white max-w-[100px] sm:max-w-none truncate">{t.description}</td>
+                    <td className="p-3 sm:p-4">
+                      <span className="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs px-2 py-1 rounded-full whitespace-nowrap">
+                        {t.category.replace(/_/g, ' ')}
+                      </span>
+                    </td>
+                    <td className="hidden sm:table-cell p-4 text-gray-500 dark:text-gray-400 text-sm">
+                      {new Date(t.date).toLocaleDateString('en-AU')}
+                    </td>
+                    <td className={`p-3 sm:p-4 text-right font-medium whitespace-nowrap ${
+                      t.amount < 0 ? 'text-green-600' : 'text-gray-900 dark:text-white'
+                    }`}>
+                      {t.amount < 0 ? '+' : ''}${Math.abs(t.amount).toFixed(2)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    )
 }
