@@ -47,7 +47,8 @@ public class UserService
             Id = Guid.NewGuid(),
             Auth0Id = auth0Id,
             Email = email,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            Name = name
         };
         
         var newSubscription = new Subscription
