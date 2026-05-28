@@ -106,7 +106,7 @@ export default async function TransactionsPage({
                     ← Previous
                 </a>
                 <span className="text-gray-500 dark:text-gray-400 text-sm">
-                    <a href={`/transactions/${page + 1}`}
+                    <a href={`/transactions?page=${page + 1}`}
                     className={`px-4 py-2 rounded-lg border dark:border-gray-600 dark:text-gray-300 ${
                         page >= totalPages
                             ? 'opacity-50 pointer-events-none'
