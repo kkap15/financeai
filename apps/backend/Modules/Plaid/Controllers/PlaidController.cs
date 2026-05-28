@@ -61,6 +61,28 @@ public class PlaidController : ControllerBase
         }
     }
 
+    [HttpPost("connections/{connectionId}/resync")]
+    public async Task<IActionResult> ResyncConnection(Guid connectionId)
+    {
+        var user = await ControllerHelper.GetCurrentUserAsync(User, _context);
+        if (user is null) return Unauthorized();
+
+        try
+        {
+            await _plaidService.ResyncConnectionAsync(connectionId, user.Id);
+            return Ok();
+        }
+        catch (InvalidOperationException e)
+        {
+            return NotFound(new { error = e.Message });
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error resyncing connection {ConnectionId}", connectionId);
+            return StatusCode(500, new { error = e.Message });
+        }
+    }
+
     [HttpGet("connections")]
     public async Task<IActionResult> GetConnections()
     {

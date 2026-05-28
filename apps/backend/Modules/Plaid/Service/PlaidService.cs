@@ -75,6 +75,19 @@ public class PlaidService
         return connection;
     }
     
+    public async Task ResyncConnectionAsync(Guid connectionId, Guid userId)
+    {
+        var connection = await _context.PlaidConnections
+            .FirstOrDefaultAsync(c => c.Id == connectionId && c.UserId == userId)
+            ?? throw new InvalidOperationException("Connection not found.");
+
+        var existing = _context.Transactions.Where(t => t.PlaidConnectionId == connectionId);
+        _context.Transactions.RemoveRange(existing);
+        await _context.SaveChangesAsync();
+
+        await SyncTransactionsAsync(connection);
+    }
+
     private async Task SyncTransactionsAsync(PlaidConnection connection)
     {
         var request = new TransactionsSyncRequest
