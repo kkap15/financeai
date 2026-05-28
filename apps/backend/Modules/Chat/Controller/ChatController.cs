@@ -1,4 +1,5 @@
 using System.Text.Json;
+using FinanceAI.Api.Attributes;
 using FinanceAI.Api.Data;
 using FinanceAI.Api.Helpers;
 using FinanceAI.Api.Modules.Chat.Services;
@@ -14,6 +15,7 @@ namespace FinanceAI.Api.Modules.Chat.Controller;
 [Route("api/[controller]")]
 public class ChatController(AgentService agentService, AppDbContext context) : ControllerBase
 {
+    [RequirePro]
     [HttpPost("agent")]
     public async Task AgentStream([FromBody] ChatRequest requestBody)
     {

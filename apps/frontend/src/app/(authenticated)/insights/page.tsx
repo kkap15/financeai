@@ -1,13 +1,31 @@
 'use client'
 
+import ProGate from "@/components/ProGate";
+import { auth0 } from "@/lib/auth0";
 import { useState } from "react"
 import ReactMarkdown from "react-markdown";
 
-export default function InsightsPage() {
+async function getSubscription(accessToken: string) {
+    const result = await fetch(`${process.env.API_URL}/api/user/subscription`, {
+        headers: {Authorization: `Bearer ${accessToken}`},
+        cache: 'no-store'
+    });
+
+    if (!result.ok) return null;
+
+    return result.json();
+}
+
+export default async function InsightsPage() {
+    const session = await auth0.getSession();
     const [insight, setInsight] = useState('');
     const [loading, setLoading] = useState(false);
     const [done, setDone] = useState(false);
+    const subscription = await getSubscription(session.tokenSet.accessToken!);
+    const isPro = subscription?.tier === 'Pro';
 
+    if (!isPro) return <ProGate />
+    
     async function getInsights() {
         setLoading(true);
         setInsight('');

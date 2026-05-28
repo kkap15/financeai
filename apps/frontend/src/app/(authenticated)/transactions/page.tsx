@@ -2,6 +2,17 @@ import TransactionSearch from "@/components/TransactionSearch";
 import { auth0 } from "@/lib/auth0";
 import { Transaction } from '../../../types/Transaction'
 
+async function getSubscription(accessToken: string) {
+    const result = await fetch(`${process.env.API_URL}/api/user/subscription`, {
+        headers: {Authorization: `Bearer ${accessToken}`},
+        cache: 'no-store'
+    });
+
+    if (!result.ok) return null;
+
+    return result.json();
+}
+
 async function getTransactions(accessToken: string, page: number) {
     const url = new URL(`${process.env.API_URL}/api/transactions`);
     url.searchParams.set('page', page.toString());
@@ -31,6 +42,8 @@ export default async function TransactionsPage({
     const { page: pageParam } = await searchParams;
     const page = parseInt(pageParam ?? '1');
     const { transactions, total, totalPages } = await getTransactions(session!.tokenSet.accessToken!, page);
+    const subscription = await getSubscription(session.tokenSet.accessToken!);
+    const isPro = subscription?.tier === 'Pro';
 
     return (
         <main className="max-w-4xl mx-auto">
@@ -38,7 +51,18 @@ export default async function TransactionsPage({
             <p className="text-gray-500 dark:text-gray-400 mb-6">{total} total transactions</p>
 
             <div className="bg-white dark:bg-gray-800 rounded-xl border dark:border-gray-700 overflow-hidden">
-                <TransactionSearch />
+
+                {isPro ? (
+                    <TransactionSearch />
+                ) : (
+                    <div className="bg-gray-800 border border-gray-700 rounded-xl p-6 text-center">
+                        <p className="text-gray-400 mb-3">Semantic search is a Pro feature.</p>
+                        <a href="/settings" className="text-blue-400 hover:underline font-medium">
+                            Upgrade to Pro
+                        </a>
+                    </div>
+                )}
+            
 
                 {/* Mobile card list */}
                 <div className="sm:hidden divide-y divide-gray-100 dark:divide-gray-700">

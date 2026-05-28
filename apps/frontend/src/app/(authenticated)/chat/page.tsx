@@ -3,11 +3,29 @@
 import { useState } from "react";
 import { Message } from "../../../types/Message";
 import ReactMarkdown from 'react-markdown';
+import { auth0 } from "@/lib/auth0";
+import ProGate from "@/components/ProGate";
 
-export default function ChatPage() {
+async function getSubscription(accessToken: string) {
+    const result = await fetch(`${process.env.API_URL}/api/user/subscription`, {
+        headers: {Authorization: `Bearer ${accessToken}`},
+        cache: 'no-store'
+    });
+
+    if (!result.ok) return null;
+
+    return result.json();
+}
+
+export default async function ChatPage() {
+    const session = await auth0.getSession();
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
+    const subscription = await getSubscription(session.tokenSet.accessToken!);
+    const isPro = subscription?.tier === 'Pro';
+
+    if (!isPro) return <ProGate />
 
 
     async function sendMessage() {

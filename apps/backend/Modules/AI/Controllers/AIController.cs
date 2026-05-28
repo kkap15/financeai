@@ -1,4 +1,5 @@
 using System.Text.Json;
+using FinanceAI.Api.Attributes;
 using FinanceAI.Api.Data;
 using FinanceAI.Api.Helpers;
 using FinanceAI.Api.Modules.AI.Service;
@@ -23,6 +24,7 @@ public class AIController : ControllerBase
     }
 
     [HttpGet("insights/stream")]
+    [RequirePro]
     public async Task StreamInsights()
     {
         var user = await ControllerHelper.GetCurrentUserAsync(User, _context);
@@ -43,6 +45,7 @@ public class AIController : ControllerBase
         await Response.Body.FlushAsync();
     }
 
+    [RequirePro]
     [HttpGet("search")]
     public async Task<IActionResult> Search([FromQuery] string query)
     {
