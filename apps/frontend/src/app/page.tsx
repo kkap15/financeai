@@ -51,7 +51,13 @@ export default async function HomePage() {
         .feature-desc { font-size: 0.875rem; color: var(--muted); line-height: 1.6; }
         .pricing-section { padding: 5rem 2rem; max-width: 900px; margin: 0 auto; }
         .pricing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 3.5rem; }
-        @media (max-width: 640px) { .pricing-grid { grid-template-columns: 1fr; } .nav-links { gap: 1rem; } nav { padding: 1rem 1.5rem; } }
+        @media (max-width: 640px) {
+          .pricing-grid { grid-template-columns: 1fr; }
+          nav { padding: 1rem 1.5rem; }
+          .nav-links a:not(.nav-cta) { display: none; }
+          .stats { gap: 1.5rem; }
+          footer { padding: 2rem 1.5rem; }
+        }
         .pricing-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; position: relative; }
         .pricing-card.featured { border-color: rgba(59,130,246,0.4); background: linear-gradient(180deg, rgba(59,130,246,0.05) 0%, var(--bg2) 100%); }
         .popular-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #3B82F6, #8B5CF6); color: white; font-size: 0.7rem; font-weight: 600; padding: 0.3rem 0.9rem; border-radius: 100px; letter-spacing: 0.05em; white-space: nowrap; }
