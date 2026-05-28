@@ -39,28 +39,52 @@ export default async function TransactionsPage({
 
             <div className="bg-white dark:bg-gray-800 rounded-xl border dark:border-gray-700 overflow-hidden">
                 <TransactionSearch />
-                <table className="w-full">
+
+                {/* Mobile card list */}
+                <div className="sm:hidden divide-y divide-gray-100 dark:divide-gray-700">
+                    {transactions.map((t: Transaction) => (
+                        <div key={t.id} className="flex items-center justify-between px-4 py-3">
+                            <div className="min-w-0 flex-1 mr-3">
+                                <p className="font-medium dark:text-white truncate">{t.description}</p>
+                                <div className="flex items-center gap-2 mt-1">
+                                    <span className="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs px-2 py-0.5 rounded-full whitespace-nowrap">
+                                        {t.category.replace(/_/g, ' ')}
+                                    </span>
+                                    <span className="text-xs text-gray-400 dark:text-gray-500">
+                                        {new Date(t.date).toLocaleDateString('en-AU')}
+                                    </span>
+                                </div>
+                            </div>
+                            <p className={`font-medium whitespace-nowrap ${t.amount < 0 ? 'text-green-600' : 'text-gray-900 dark:text-white'}`}>
+                                {t.amount < 0 ? '+' : ''}${Math.abs(t.amount).toFixed(2)}
+                            </p>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Desktop table */}
+                <table className="hidden sm:table w-full">
                     <thead className="bg-gray-50 dark:bg-gray-700 border-b dark:border-gray-600">
                         <tr>
-                            <th className="text-left p-3 sm:p-4 text-sm font-medium text-gray-500 dark:text-gray-400">Description</th>
-                            <th className="text-left p-3 sm:p-4 text-sm font-medium text-gray-500 dark:text-gray-400">Category</th>
-                            <th className="hidden sm:table-cell text-left p-4 text-sm font-medium text-gray-500 dark:text-gray-400">Date</th>
-                            <th className="text-right p-3 sm:p-4 text-sm font-medium text-gray-500 dark:text-gray-400">Amount</th>
+                            <th className="text-left p-4 text-sm font-medium text-gray-500 dark:text-gray-400">Description</th>
+                            <th className="text-left p-4 text-sm font-medium text-gray-500 dark:text-gray-400">Category</th>
+                            <th className="text-left p-4 text-sm font-medium text-gray-500 dark:text-gray-400">Date</th>
+                            <th className="text-right p-4 text-sm font-medium text-gray-500 dark:text-gray-400">Amount</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                         {transactions.map((t: Transaction) => (
                             <tr key={t.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                                <td className="p-3 sm:p-4 font-medium dark:text-white max-w-[100px] sm:max-w-none truncate">{t.description}</td>
-                                <td className="p-3 sm:p-4">
+                                <td className="p-4 font-medium dark:text-white">{t.description}</td>
+                                <td className="p-4">
                                     <span className="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs px-2 py-1 rounded-full whitespace-nowrap">
                                         {t.category.replace(/_/g, ' ')}
                                     </span>
                                 </td>
-                                <td className="hidden sm:table-cell p-4 text-gray-500 dark:text-gray-400 text-sm">
+                                <td className="p-4 text-gray-500 dark:text-gray-400 text-sm">
                                     {new Date(t.date).toLocaleDateString('en-AU')}
                                 </td>
-                                <td className={`p-3 sm:p-4 text-right font-medium whitespace-nowrap ${
+                                <td className={`p-4 text-right font-medium whitespace-nowrap ${
                                     t.amount < 0 ? 'text-green-600' : 'text-gray-900 dark:text-white'
                                 }`}>
                                     {t.amount < 0 ? '+' : ''}${Math.abs(t.amount).toFixed(2)}

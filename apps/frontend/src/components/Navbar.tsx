@@ -19,8 +19,8 @@ export default function Navbar({ isPro, userName }: { isPro: boolean; userName?:
     const [menuOpen, setMenuOpen] = useState(false)
 
     return (
-        <nav className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-            <div className="max-w-6xl mx-auto px-4 sm:px-8">
+        <nav className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 pt-[env(safe-area-inset-top)]">
+            <div className="max-w-6xl mx-auto px-4 sm:px-8 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))]">
 
                 {/* Top bar */}
                 <div className="flex items-center justify-between h-16">

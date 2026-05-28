@@ -6,6 +6,12 @@ export const metadata = {
   description: 'AI-powered personal finance dashboard',
 };
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+};
+
 export default function RootLayout({
   children,
 }: {
