@@ -174,7 +174,6 @@ export default async function DashboardPage({
                     <p style={{ fontSize: '40px', marginBottom: '12px' }}>🏦</p>
                     <h2 className="dash-heading" style={{ marginBottom: '6px' }}>No transactions yet</h2>
                     <p className="dash-hint" style={{ fontSize: '14px', marginBottom: '24px' }}>Connect your bank account to get started</p>
-                    <ConnectBankButton />
                 </div>
             )}
 
