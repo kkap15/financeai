@@ -19,26 +19,114 @@ export default function Navbar({ isPro, userName }: { isPro: boolean; userName?:
     const [menuOpen, setMenuOpen] = useState(false)
 
     return (
-        <nav className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 pt-[env(safe-area-inset-top)]">
-            <div className="max-w-6xl mx-auto px-4 sm:px-8 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))]">
+        <>
+        <style>{`
+            .nav-root {
+                background: #ffffff;
+                border-bottom: 1px solid #f3f4f6;
+                padding-top: env(safe-area-inset-top);
+                position: sticky;
+                top: 0;
+                z-index: 50;
+            }
+            .nav-logo {
+                font-size: 1.1rem;
+                font-weight: 700;
+                color: #6366f1;
+                text-decoration: none;
+                letter-spacing: -0.02em;
+                font-family: 'DM Sans', sans-serif;
+                flex-shrink: 0;
+            }
+            .nav-link {
+                padding: 6px 12px;
+                border-radius: 8px;
+                font-size: 13px;
+                font-weight: 500;
+                text-decoration: none;
+                color: #6b7280;
+                transition: color 0.15s, background 0.15s;
+                white-space: nowrap;
+            }
+            .nav-link:hover { color: #111827; background: #f9fafb; }
+            .nav-link.active { color: #6366f1; background: #eef2ff; }
+            .nav-pro {
+                background: linear-gradient(135deg, #6366f1, #a855f7);
+                color: white;
+                font-size: 11px;
+                font-weight: 700;
+                padding: 3px 10px;
+                border-radius: 999px;
+                letter-spacing: 0.04em;
+            }
+            .nav-username { font-size: 13px; font-weight: 500; color: #374151; }
+            .nav-action {
+                font-size: 13px;
+                color: #9ca3af;
+                text-decoration: none;
+                background: none;
+                border: none;
+                cursor: pointer;
+                transition: color 0.15s;
+                font-family: 'DM Sans', sans-serif;
+                padding: 0;
+            }
+            .nav-action:hover { color: #374151; }
+            .nav-mobile-menu {
+                border-top: 1px solid #f3f4f6;
+                background: #ffffff;
+                padding: 12px 16px;
+            }
+            .nav-mobile-link {
+                display: block;
+                padding: 10px 12px;
+                border-radius: 8px;
+                font-size: 14px;
+                font-weight: 500;
+                text-decoration: none;
+                color: #6b7280;
+                transition: color 0.15s, background 0.15s;
+            }
+            .nav-mobile-link:hover { color: #111827; background: #f9fafb; }
+            .nav-mobile-link.active { color: #6366f1; background: #eef2ff; }
+            .nav-mobile-footer {
+                margin-top: 8px;
+                padding-top: 12px;
+                border-top: 1px solid #f3f4f6;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
 
-                {/* Top bar */}
-                <div className="flex items-center justify-between h-16">
-                    <Link href="/dashboard" className="text-xl font-bold text-blue-600 shrink-0">
-                        FinanceAI
-                    </Link>
+            .dark .nav-root { background: #111827; border-bottom-color: #1f2937; }
+            .dark .nav-logo { color: #818cf8; }
+            .dark .nav-link { color: #9ca3af; }
+            .dark .nav-link:hover { color: #f9fafb; background: #1f2937; }
+            .dark .nav-link.active { color: #818cf8; background: rgba(99,102,241,0.15); }
+            .dark .nav-username { color: #d1d5db; }
+            .dark .nav-action { color: #6b7280; }
+            .dark .nav-action:hover { color: #d1d5db; }
+            .dark .nav-mobile-menu { background: #111827; border-top-color: #1f2937; }
+            .dark .nav-mobile-link { color: #9ca3af; }
+            .dark .nav-mobile-link:hover { color: #f9fafb; background: #1f2937; }
+            .dark .nav-mobile-link.active { color: #818cf8; background: rgba(99,102,241,0.15); }
+            .dark .nav-mobile-footer { border-top-color: #1f2937; }
+        `}</style>
 
-                    {/* Desktop nav */}
-                    <div className="hidden md:flex items-center gap-1">
+        <nav className="nav-root">
+            <div style={{ maxWidth: '1152px', margin: '0 auto', padding: '0 max(1rem, env(safe-area-inset-left)) 0 max(1rem, env(safe-area-inset-right))' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '60px' }}>
+
+                    {/* Logo */}
+                    <Link href="/dashboard" className="nav-logo">FinanceAI</Link>
+
+                    {/* Desktop nav links */}
+                    <div className="hidden md:flex" style={{ alignItems: 'center', gap: '2px' }}>
                         {navLinks.map(link => (
                             <Link
                                 key={link.href}
                                 href={link.href}
-                                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                                    pathName === link.href
-                                        ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
-                                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white'
-                                }`}
+                                className={`nav-link ${pathName === link.href ? 'active' : ''}`}
                             >
                                 {link.label}
                             </Link>
@@ -46,43 +134,33 @@ export default function Navbar({ isPro, userName }: { isPro: boolean; userName?:
                     </div>
 
                     {/* Desktop right */}
-                    <div className="hidden md:flex items-center gap-3">
-                        {isPro && (
-                            <span className="bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs font-bold px-3 py-1 rounded-full">
-                                PRO
-                            </span>
-                        )}
-                        {userName && (
-                            <p className="text-sm font-medium text-gray-800 dark:text-gray-300">{userName}</p>
-                        )}
-                        <button onClick={toggle} aria-label="Toggle dark mode"
-                            className="text-sm text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
+                    <div className="hidden md:flex" style={{ alignItems: 'center', gap: '12px' }}>
+                        {isPro && <span className="nav-pro">PRO</span>}
+                        {userName && <p className="nav-username">{userName}</p>}
+                        <button onClick={toggle} className="nav-action" aria-label="Toggle theme">
                             {theme === 'dark' ? '☀️' : '🌙'}
                         </button>
-                        <a href="/logout" className="text-sm text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
-                            Logout
-                        </a>
+                        <a href="/auth/logout" className="nav-action">Logout</a>
                     </div>
 
                     {/* Mobile right */}
-                    <div className="flex md:hidden items-center gap-3">
-                        {isPro && (
-                            <span className="bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                                PRO
-                            </span>
-                        )}
-                        <button onClick={toggle} aria-label="Toggle dark mode"
-                            className="text-gray-500 dark:text-gray-400">
+                    <div className="flex md:hidden" style={{ alignItems: 'center', gap: '10px' }}>
+                        {isPro && <span className="nav-pro">PRO</span>}
+                        <button onClick={toggle} className="nav-action" aria-label="Toggle theme">
                             {theme === 'dark' ? '☀️' : '🌙'}
                         </button>
-                        <button onClick={() => setMenuOpen(o => !o)} aria-label="Toggle menu"
-                            className="text-gray-600 dark:text-gray-300 p-1">
+                        <button
+                            onClick={() => setMenuOpen(o => !o)}
+                            aria-label="Toggle menu"
+                            className="nav-action"
+                            style={{ padding: '4px' }}
+                        >
                             {menuOpen ? (
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                                 </svg>
                             ) : (
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                                 </svg>
                             )}
@@ -93,31 +171,29 @@ export default function Navbar({ isPro, userName }: { isPro: boolean; userName?:
 
             {/* Mobile menu */}
             {menuOpen && (
-                <div className="md:hidden border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 space-y-1">
+                <div className="md:hidden nav-mobile-menu">
                     {navLinks.map(link => (
                         <Link
                             key={link.href}
                             href={link.href}
                             onClick={() => setMenuOpen(false)}
-                            className={`block px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                                pathName === link.href
-                                    ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
-                                    : 'text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700'
-                            }`}
+                            className={`nav-mobile-link ${pathName === link.href ? 'active' : ''}`}
                         >
                             {link.label}
                         </Link>
                     ))}
-                    <div className="pt-2 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between">
-                        {userName && (
-                            <p className="text-sm text-gray-600 dark:text-gray-300">{userName}</p>
-                        )}
-                        <a href="/logout" className="text-sm text-gray-500 hover:text-gray-900 dark:text-gray-400">
-                            Logout
-                        </a>
+                    <div className="nav-mobile-footer">
+                        {userName && <p className="nav-username" style={{ fontSize: '13px' }}>{userName}</p>}
+                        <div style={{ display: 'flex', gap: '16px' }}>
+                            <button onClick={toggle} className="nav-action" aria-label="Toggle theme">
+                                {theme === 'dark' ? '☀️' : '🌙'}
+                            </button>
+                            <a href="/auth/logout" className="nav-action">Logout</a>
+                        </div>
                     </div>
                 </div>
             )}
         </nav>
+        </>
     )
 }

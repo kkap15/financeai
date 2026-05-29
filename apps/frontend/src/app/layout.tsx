@@ -6,16 +6,10 @@ export const metadata : Metadata = {
   title: 'FinanceAI',
   description: 'AI-powered personal finance dashboard',
   manifest: '/manifest.json',
-  themeColor: '#3B82F6',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
     title: 'FinanceAI'
-  },
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 1
   }
 };
 
@@ -32,7 +26,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body>
+      <head>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body style={{ fontFamily: "'DM Sans', sans-serif" }}>
         <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>

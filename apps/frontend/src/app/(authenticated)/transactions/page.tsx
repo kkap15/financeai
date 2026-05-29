@@ -4,12 +4,10 @@ import { Transaction } from '../../../types/Transaction'
 
 async function getSubscription(accessToken: string) {
     const result = await fetch(`${process.env.API_URL}/api/user/subscription`, {
-        headers: {Authorization: `Bearer ${accessToken}`},
+        headers: { Authorization: `Bearer ${accessToken}` },
         cache: 'no-store'
     });
-
     if (!result.ok) return null;
-
     return result.json();
 }
 
@@ -18,100 +16,160 @@ async function getTransactions(accessToken: string, page: number) {
     url.searchParams.set('page', page.toString());
     url.searchParams.set('pageSize', '20');
     const response = await fetch(url.toString(), {
-        headers: {
-            Authorization: `Bearer ${accessToken}`,
-            cache: 'no-store'
-        }
+        headers: { Authorization: `Bearer ${accessToken}` },
+        cache: 'no-store'
     })
-
     const text = await response.text()
-
-    if (!response.ok || !text) {
-        return { transactions: [], total: 0, totalPages: 0 };
-    }
-
+    if (!response.ok || !text) return { transactions: [], total: 0, totalPages: 0 };
     return JSON.parse(text);
+}
+
+function formatCategory(category: string) {
+    return category.toLowerCase().replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
 }
 
 export default async function TransactionsPage({
     searchParams,
-} : {
+}: {
     searchParams: Promise<{ page?: string }>
 }) {
     const session = await auth0.getSession();
     const { page: pageParam } = await searchParams;
     const page = parseInt(pageParam ?? '1');
     const { transactions, total, totalPages } = await getTransactions(session!.tokenSet.accessToken!, page);
-    const subscription = await getSubscription(session.tokenSet.accessToken!);
+    const subscription = await getSubscription(session!.tokenSet.accessToken!);
     const isPro = subscription?.tier === 'Pro';
 
     return (
-        <main className="max-w-4xl mx-auto">
-            <h1 className="text-3xl font-bold mb-2 dark:text-white">Transactions</h1>
-            <p className="text-gray-500 dark:text-gray-400 mb-6">{total} total transactions</p>
+        <>
+        <style>{`
+            .tx-card {
+                background: #ffffff;
+                border: 1px solid #f3f4f6;
+                border-radius: 16px;
+                overflow: hidden;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            }
+            .tx-heading { color: #111827; font-size: 24px; font-weight: 700; margin: 0; line-height: 1.5; }
+            .tx-hint { color: #9ca3af; font-size: 14px; margin-top: 4px; }
+            .tx-th { background: #f9fafb; border-bottom: 1px solid #f3f4f6; }
+            .tx-th th { color: #6b7280; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.07em; padding: 12px 20px; text-align: left; }
+            .tx-row { border-bottom: 1px solid #f3f4f6; transition: background 0.15s; }
+            .tx-row:last-child { border-bottom: none; }
+            .tx-row:hover { background: #f9fafb; }
+            .tx-cell { padding: 14px 20px; color: #111827; font-size: 14px; }
+            .tx-cell-muted { color: #9ca3af; font-size: 13px; }
+            .tx-badge { background: #eef2ff; color: #6366f1; font-size: 11px; padding: 3px 10px; border-radius: 999px; white-space: nowrap; font-weight: 500; }
+            .tx-divider { border-bottom: 1px solid #f3f4f6; }
+            .tx-mobile-row { padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+            .tx-mobile-row:not(:last-child) { border-bottom: 1px solid #f3f4f6; }
+            .tx-page-btn {
+                padding: 8px 16px;
+                border-radius: 10px;
+                border: 1px solid #e5e7eb;
+                background: #ffffff;
+                color: #374151;
+                font-size: 13px;
+                font-weight: 500;
+                text-decoration: none;
+                transition: background 0.15s;
+            }
+            .tx-page-btn:hover { background: #f9fafb; }
+            .tx-page-btn.disabled { opacity: 0.4; pointer-events: none; }
+            .tx-locked { background: #f9fafb; border-bottom: 1px solid #f3f4f6; padding: 20px; text-align: center; }
+            .tx-locked-text { color: #6b7280; font-size: 14px; margin-bottom: 8px; }
 
-            <div className="bg-white dark:bg-gray-800 rounded-xl border dark:border-gray-700 overflow-hidden">
+            .dark .tx-card { background: #1f2937; border-color: rgba(55,65,81,0.5); box-shadow: none; }
+            .dark .tx-heading { color: #f9fafb; }
+            .dark .tx-hint { color: #6b7280; }
+            .dark .tx-th { background: #111827; border-bottom-color: #374151; }
+            .dark .tx-th th { color: #6b7280; }
+            .dark .tx-row { border-bottom-color: #374151; }
+            .dark .tx-row:hover { background: rgba(55,65,81,0.3); }
+            .dark .tx-cell { color: #f9fafb; }
+            .dark .tx-cell-muted { color: #6b7280; }
+            .dark .tx-badge { background: rgba(99,102,241,0.15); color: #818cf8; }
+            .dark .tx-divider { border-bottom-color: #374151; }
+            .dark .tx-mobile-row:not(:last-child) { border-bottom-color: #374151; }
+            .dark .tx-page-btn { background: #1f2937; border-color: #374151; color: #d1d5db; }
+            .dark .tx-page-btn:hover { background: #374151; }
+            .dark .tx-locked { background: #111827; border-bottom-color: #374151; }
+            .dark .tx-locked-text { color: #6b7280; }
+        `}</style>
 
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+
+            {/* Header */}
+            <div>
+                <h1 className="tx-heading">Transactions</h1>
+                <p className="tx-hint">{total} total transactions</p>
+            </div>
+
+            {/* Main Card */}
+            <div className="tx-card">
+
+                {/* Search */}
                 {isPro ? (
                     <TransactionSearch />
                 ) : (
-                    <div className="bg-gray-800 border border-gray-700 rounded-xl p-6 text-center">
-                        <p className="text-gray-400 mb-3">Semantic search is a Pro feature.</p>
-                        <a href="/settings" className="text-blue-400 hover:underline font-medium">
-                            Upgrade to Pro
+                    <div className="tx-locked">
+                        <p className="tx-locked-text">Semantic search is a Pro feature</p>
+                        <a href="/settings" style={{ color: '#6366f1', fontSize: '14px', fontWeight: 500, textDecoration: 'none' }}>
+                            Upgrade to Pro →
                         </a>
                     </div>
                 )}
-            
 
-                {/* Mobile card list */}
-                <div className="sm:hidden divide-y divide-gray-100 dark:divide-gray-700">
+                {/* Mobile list */}
+                <div className="sm:hidden">
                     {transactions.map((t: Transaction) => (
-                        <div key={t.id} className="flex items-center justify-between px-4 py-3">
-                            <div className="min-w-0 flex-1 mr-3">
-                                <p className="font-medium dark:text-white truncate">{t.description}</p>
-                                <div className="flex items-center gap-2 mt-1">
-                                    <span className="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs px-2 py-0.5 rounded-full whitespace-nowrap">
-                                        {t.category.replace(/_/g, ' ')}
-                                    </span>
-                                    <span className="text-xs text-gray-400 dark:text-gray-500">
-                                        {new Date(t.date).toLocaleDateString('en-AU')}
+                        <div key={t.id} className="tx-mobile-row">
+                            <div style={{ minWidth: 0, flex: 1 }}>
+                                <p className="tx-cell" style={{ padding: 0, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                    {t.description}
+                                </p>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+                                    <span className="tx-badge">{formatCategory(t.category)}</span>
+                                    <span className="tx-cell-muted" style={{ fontSize: '11px' }}>
+                                        {new Date(t.date).toLocaleDateString('en-AU', { day: 'numeric', month: 'short' })}
                                     </span>
                                 </div>
                             </div>
-                            <p className={`font-medium whitespace-nowrap ${t.amount < 0 ? 'text-green-600' : 'text-gray-900 dark:text-white'}`}>
-                                {t.amount < 0 ? '+' : ''}${Math.abs(t.amount).toFixed(2)}
+                            <p style={{
+                                color: t.amount < 0 ? '#10b981' : undefined,
+                                fontSize: '14px', fontWeight: 600, flexShrink: 0
+                            }} className={t.amount >= 0 ? 'tx-cell' : ''}>
+                                {t.amount < 0 ? '+' : '-'}${Math.abs(t.amount).toFixed(2)}
                             </p>
                         </div>
                     ))}
                 </div>
 
                 {/* Desktop table */}
-                <table className="hidden sm:table w-full">
-                    <thead className="bg-gray-50 dark:bg-gray-700 border-b dark:border-gray-600">
+                <table className="hidden sm:table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <thead className="tx-th">
                         <tr>
-                            <th className="text-left p-4 text-sm font-medium text-gray-500 dark:text-gray-400">Description</th>
-                            <th className="text-left p-4 text-sm font-medium text-gray-500 dark:text-gray-400">Category</th>
-                            <th className="text-left p-4 text-sm font-medium text-gray-500 dark:text-gray-400">Date</th>
-                            <th className="text-right p-4 text-sm font-medium text-gray-500 dark:text-gray-400">Amount</th>
+                            <th>Description</th>
+                            <th>Category</th>
+                            <th>Date</th>
+                            <th style={{ textAlign: 'right' }}>Amount</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+                    <tbody>
                         {transactions.map((t: Transaction) => (
-                            <tr key={t.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                                <td className="p-4 font-medium dark:text-white">{t.description}</td>
-                                <td className="p-4">
-                                    <span className="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs px-2 py-1 rounded-full whitespace-nowrap">
-                                        {t.category.toLowerCase().replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
-                                    </span>
+                            <tr key={t.id} className="tx-row">
+                                <td className="tx-cell" style={{ fontWeight: 500 }}>{t.description}</td>
+                                <td className="tx-cell">
+                                    <span className="tx-badge">{formatCategory(t.category)}</span>
                                 </td>
-                                <td className="p-4 text-gray-500 dark:text-gray-400 text-sm">
-                                    {new Date(t.date).toLocaleDateString('en-AU')}
+                                <td className="tx-cell tx-cell-muted">
+                                    {new Date(t.date).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })}
                                 </td>
-                                <td className={`p-4 text-right font-medium whitespace-nowrap ${
-                                    t.amount < 0 ? 'text-green-600' : 'text-gray-900 dark:text-white'
-                                }`}>
-                                    {t.amount < 0 ? '+' : ''}${Math.abs(t.amount).toFixed(2)}
+                                <td className="tx-cell" style={{
+                                    textAlign: 'right', fontWeight: 600,
+                                    color: t.amount < 0 ? '#10b981' : undefined
+                                }}>
+                                    {t.amount < 0 ? '+' : '-'}${Math.abs(t.amount).toFixed(2)}
                                 </td>
                             </tr>
                         ))}
@@ -119,28 +177,21 @@ export default async function TransactionsPage({
                 </table>
             </div>
 
-            <div className="flex justify-between items-center mt-6">
+            {/* Pagination */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <a href={`/transactions?page=${page - 1}`}
-                className={`px-4 py-2 rounded-lg border dark:border-gray-600 dark:text-gray-300 ${
-                    page <= 1
-                        ? 'opacity-50 pointer-events-none'
-                        : 'hover:bg-gray-50 dark:hover:bg-gray-700'
-                }`}
-                >
+                    className={`tx-page-btn ${page <= 1 ? 'disabled' : ''}`}>
                     ← Previous
                 </a>
-                <span className="text-gray-500 dark:text-gray-400 text-sm">
-                    <a href={`/transactions?page=${page + 1}`}
-                    className={`px-4 py-2 rounded-lg border dark:border-gray-600 dark:text-gray-300 ${
-                        page >= totalPages
-                            ? 'opacity-50 pointer-events-none'
-                            : 'hover:bg-gray-50 dark:hover:bg-gray-700'
-                    }`}
-                    >
-                        Next →
-                    </a>
+                <span className="tx-hint" style={{ fontSize: '13px' }}>
+                    Page {page} of {totalPages}
                 </span>
+                <a href={`/transactions?page=${page + 1}`}
+                    className={`tx-page-btn ${page >= totalPages ? 'disabled' : ''}`}>
+                    Next →
+                </a>
             </div>
-        </main>
+        </div>
+        </>
     )
 }

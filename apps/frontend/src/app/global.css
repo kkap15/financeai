@@ -8,3 +8,9 @@ html, body {
 html.dark, html.dark body {
   background-color: #111827; /* gray-900 — matches authenticated layout dark bg */
 }
+
+h1, h2, h3 {
+    line-height: 1.4;
+    overflow: visible;
+    padding-bottom: 0.1em;
+}

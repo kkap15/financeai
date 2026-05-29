@@ -1,16 +1,29 @@
 import BudgetForm from '@/components/BudgetForm';
 import { auth0 } from '@/lib/auth0';
-import {Budget} from '../../../types/Budget'
+import { Budget } from '../../../types/Budget'
 
 async function getBudgets(accessToken: string): Promise<Budget[]> {
     const response = await fetch(`${process.env.API_URL}/api/budget`, {
-    headers: {Authorization: `Bearer ${accessToken}`},
+        headers: { Authorization: `Bearer ${accessToken}` },
         cache: 'no-store'
     });
+    return response.json();
+}
 
-    var data = await response.json();
+function formatCategory(category: string) {
+    return category.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+}
 
-    return data;
+function getProgressColor(percentage: number) {
+    if (percentage >= 100) return '#f87171'
+    if (percentage >= 80) return '#fbbf24'
+    return '#6366f1'
+}
+
+function getPercentageColor(percentage: number) {
+    if (percentage >= 100) return '#f87171'
+    if (percentage >= 80) return '#fbbf24'
+    return '#6366f1'
 }
 
 export default async function BudgetPage() {
@@ -18,56 +31,87 @@ export default async function BudgetPage() {
     const budgets = await getBudgets(session!.tokenSet.accessToken);
 
     return (
-        <div>
-            <div className="flex justify-between items-center mb-8">
-                <div>
-                    <h1 className="text-3xl font-bold dark:text-gray-300">Budgets</h1>
-                    <p className="text-gray-500 dark:text-gray-500">Track your monthly spending limits</p>
-                </div>
+        <>
+        <style>{`
+            .b-card {
+                background: #ffffff;
+                border: 1px solid #f3f4f6;
+                border-radius: 16px;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            }
+            .b-heading { color: #111827; font-size: 15px; font-weight: 600; margin: 0; line-height: 1.3; }
+            .b-label { color: #6b7280; font-size: 12px; margin-top: 2px; }
+            .b-hint { color: #9ca3af; font-size: 13px; }
+            .b-progress-track { background: #f3f4f6; border-radius: 999px; height: 6px; overflow: hidden; }
+
+            .dark .b-card { background: #1f2937; border-color: rgba(55,65,81,0.5); box-shadow: none; }
+            .dark .b-heading { color: #f9fafb; }
+            .dark .b-label { color: #6b7280; }
+            .dark .b-hint { color: #6b7280; }
+            .dark .b-progress-track { background: #374151; }
+        `}</style>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+
+            {/* Header */}
+            <div>
+                <h1 className="b-heading" style={{ fontFamily: "'DM-Sans', sans-serif", fontSize: '24px', lineHeight:'1.3', paddingBottom: '2px' }}>Budgets</h1>
+                <p className="b-hint" style={{ marginTop: '4px', fontSize: '14px' }}>Track your monthly spending limits</p>
             </div>
 
+            {/* Budget List */}
             {budgets.length === 0 ? (
-                <div className="dark:bg-gray-800 bg-white rounded-xl shadow p-12 text-center mb-8">
-                    <p className="text-gray-500 dark:text-white">No budgets set yet</p>
-                    <p className="text-sm text-gray-400 mt-1">
-                        Create your first budget below
-                    </p>
+                <div className="b-card" style={{ padding: '48px 24px', textAlign: 'center', borderStyle: 'dashed' }}>
+                    <p style={{ fontSize: '32px', marginBottom: '12px' }}>📊</p>
+                    <p className="b-heading" style={{ marginBottom: '4px' }}>No budgets yet</p>
+                    <p className="b-hint">Create your first budget below</p>
                 </div>
             ) : (
-                <ul className="space-y-4 mb-8">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     {budgets.map((budget) => (
-                        <li key={budget.category} className="bg-white rounded-xl shadow p-6 dark:bg-gray-800">
-                            <div className="mb-2">
-                                <div className="flex justify-between items-center">
-                                    <span className="font-medium text-gray-800 dark:text-white">
-                                        {budget.category.replace(/_/g, ' ')}
-                                    </span>
-                                    <span className={`text-sm font-semibold ${
-                                        budget.percentage >= 100 ? 'text-red-500' :
-                                        budget.percentage >= 80 ? 'text-yellow-500' :
-                                        'text-blue-500'
-                                    }`}>
-                                        {budget.percentage}%
-                                    </span>
+                        <div key={budget.category} className="b-card" style={{ padding: '20px 24px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px', gap: '8px' }}>
+                                <div>
+                                    <p className="b-heading" style={{ fontSize: '14px' }}>
+                                        {formatCategory(budget.category)}
+                                    </p>
+                                    <p className="b-label">
+                                        ${budget.spent.toFixed(2)} of ${budget.limit.toFixed(2)}
+                                    </p>
                                 </div>
-                                <span className="text-sm text-gray-500 dark:text-white">
-                                    ${budget.spent.toFixed(2)} of ${budget.limit.toFixed(2)}
+                                <span style={{
+                                    color: getPercentageColor(budget.percentage),
+                                    fontSize: '13px', fontWeight: 600, flexShrink: 0
+                                }}>
+                                    {budget.percentage.toFixed(1)}%
                                 </span>
                             </div>
-                            <div className="w-full bg-gray-100 rounded-full h-2">
-                                <div 
-                                className={`h-2 rounded-full ${
-                                    budget.percentage >= 100 ? 'bg-red-500' :
-                                    budget.percentage >= 80 ? 'bg-yellow-500' :
-                                    'bg-blue-500'}`}
-                                    style={{ width: `${Math.min(budget.percentage, 100)}%` }} 
-                                />
+
+                            {/* Progress Bar */}
+                            <div className="b-progress-track">
+                                <div style={{
+                                    height: '100%',
+                                    borderRadius: '999px',
+                                    background: getProgressColor(budget.percentage),
+                                    width: `${Math.min(budget.percentage, 100)}%`,
+                                    transition: 'width 0.3s ease'
+                                }} />
                             </div>
-                        </li>
+
+                            {/* Over budget warning */}
+                            {budget.percentage >= 100 && (
+                                <p style={{ color: '#f87171', fontSize: '11px', marginTop: '8px' }}>
+                                    ⚠️ Over budget by ${(budget.spent - budget.limit).toFixed(2)}
+                                </p>
+                            )}
+                        </div>
                     ))}
-                </ul>
+                </div>
             )}
+
+            {/* Form */}
             <BudgetForm />
         </div>
+        </>
     )
 }

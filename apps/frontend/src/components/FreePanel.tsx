@@ -1,59 +1,72 @@
 'use client'
 
+const features = [
+    { feature: 'Connect 1 bank account', free: true },
+    { feature: 'Transaction history', free: true },
+    { feature: 'Budget tracking', free: true },
+    { feature: 'Spending dashboard', free: true },
+    { feature: 'AI spending insights', free: false },
+    { feature: 'AI finance chat', free: false },
+    { feature: 'Semantic transaction search', free: false },
+    { feature: 'Unlimited bank accounts', free: false },
+]
+
 export default function FreePanel() {
     async function handleUpgrade() {
-        const res = await fetch('/api/subscriptions/checkout', {method: 'POST'});
-        const { url } = await res.json();
-        window.location.href = url;
+        const res = await fetch('/api/subscriptions/checkout', { method: 'POST' })
+        const { url } = await res.json()
+        window.location.href = url
     }
 
-    return(
-        <div>
-            <div className="flex items-center gap-3 mb-6">
-                <span className="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-3 py-1 rounded-full text-sm font-medium">
-                    Free Plan
-                </span>
-            </div>
+    return (
+        <>
+        <style>{`
+            .fp-badge { background: #f3f4f6; color: #6b7280; font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 999px; letter-spacing: 0.04em; text-transform: uppercase; display: inline-block; margin-bottom: 20px; }
+            .fp-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f3f4f6; }
+            .fp-row:last-of-type { border-bottom: none; }
+            .fp-feature { color: #374151; font-size: 13px; }
+            .fp-check { color: #10b981; font-size: 14px; }
+            .fp-cross { color: #d1d5db; font-size: 14px; }
+            .fp-upgrade { background: rgba(99,102,241,0.06); border: 1px solid rgba(99,102,241,0.15); border-radius: 14px; padding: 24px; text-align: center; margin-top: 24px; }
+            .fp-upgrade-title { color: #111827; font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+            .fp-upgrade-hint { color: #9ca3af; font-size: 13px; margin-bottom: 16px; }
+            .fp-price { color: #111827; font-size: 2rem; font-weight: 700; margin-bottom: 16px; letter-spacing: -0.03em; }
+            .fp-price span { color: #9ca3af; font-size: 14px; font-weight: 400; }
+            .fp-btn { background: #6366f1; color: white; border: none; border-radius: 10px; padding: 12px 24px; font-size: 14px; font-weight: 500; cursor: pointer; width: 100%; transition: opacity 0.15s; font-family: 'DM Sans', sans-serif; }
+            .fp-btn:hover { opacity: 0.9; }
 
-            <div className="space-y-3 mb-8">
-                {[
-                    { feature: 'Connect 1 bank account', free: true, pro: true },
-                    { feature: 'Last 30 days transaction', free: true, pro: true },
-                    { feature: 'Unlimited bank accounts', free: false, pro: true },
-                    { feature: 'Full transactions history', free: false, pro: true },
-                    { feature: 'AI spending insights', free: false, pro: true },
-                    { feature: 'AI finance chat', free: false, pro: true },
-                    { feature: 'Semantic transaction search', free: false, pro: true },
-                    { feature: 'Budget Tracking', free: false, pro: true }
-                ].map(({ feature, free, pro }) => (
-                    <div key={feature} className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700">
-                        <span className="text-gray-700 dark:text-gray-300 text-sm">{feature}</span>
-                        <div className="flex gap-8">
-                            <span className="text-sm w-12 text-center">
-                                {free ? '✅' : '-'}
-                            </span>
-                            <span className="text-sm w-12 text-center">
-                                {pro ? '✅' : '-'}
-                            </span>
-                        </div>
+            .dark .fp-badge { background: #374151; color: #9ca3af; }
+            .dark .fp-row { border-bottom-color: #374151; }
+            .dark .fp-feature { color: #d1d5db; }
+            .dark .fp-cross { color: #4b5563; }
+            .dark .fp-upgrade { background: rgba(99,102,241,0.08); border-color: rgba(99,102,241,0.2); }
+            .dark .fp-upgrade-title { color: #f9fafb; }
+            .dark .fp-price { color: #f9fafb; }
+        `}</style>
+
+        <div>
+            <span className="fp-badge">Free Plan</span>
+
+            <div>
+                {features.map(({ feature, free }) => (
+                    <div key={feature} className="fp-row">
+                        <span className="fp-feature">{feature}</span>
+                        <span className={free ? 'fp-check' : 'fp-cross'}>
+                            {free ? '✓' : '✕'}
+                        </span>
                     </div>
                 ))}
             </div>
 
-            <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6 text-center">
-                <p className="text-lg font-semibold mb-1 dark:text-white">Upgrade to Pro</p>
-                <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">
-                    Unlock AI insights, unlimited banks and more
-                </p>
-                <p className="text-3xl font-bold mb-4 dark:text-white">
-                    $9<span className="text-lg text-gray-500 dark:text-gray-400 font-normal">/month</span>
-                </p>
-                <button
-                onClick={handleUpgrade}
-                className="bg-blue-500 text-white px-8 py-3 rounded-xl font-medium hover:bg-blue-600 w-full">
+            <div className="fp-upgrade">
+                <p className="fp-upgrade-title">Upgrade to Pro</p>
+                <p className="fp-upgrade-hint">Unlock AI insights, chat, and semantic search</p>
+                <p className="fp-price">$10<span>/month</span></p>
+                <button onClick={handleUpgrade} className="fp-btn">
                     Upgrade to Pro →
                 </button>
             </div>
         </div>
+        </>
     )
 }
