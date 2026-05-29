@@ -76,7 +76,7 @@ public class BankingController : ControllerBase
     }
     
     [HttpPost("connections/{connectionId}/resync")]
-    public async Task<IActionResult> ResyncConnection([FromBody] ExchangeRequest request, Guid connectionId)
+    public async Task<IActionResult> ResyncConnection(Guid connectionId)
     {
         var user = await ControllerHelper.GetCurrentUserAsync(User, _context);
         if (user is null) return Unauthorized();
@@ -87,7 +87,7 @@ public class BankingController : ControllerBase
             if (connection is null) return NotFound(new { error = "Connection not found" });
 
             var service = _bankServiceFactory.GetService(connection.Provider);
-            await service.SyncTransactionsAsync(connection);
+            await service.ResyncTransactionsAsync(connection);
             return Ok();
         }
         catch (InvalidOperationException e)

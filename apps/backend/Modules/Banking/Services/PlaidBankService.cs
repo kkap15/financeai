@@ -68,22 +68,14 @@ public class PlaidBankService : BankServiceBase
             AccessToken = exchangeResponse.AccessToken,
             ItemId = exchangeResponse.ItemId,
             InstitutionName = institutionName,
-            LastSynced = DateTime.UtcNow
+            LastSynced = DateTime.UtcNow,
+            Provider = BankProvider.Plaid
         };
         
         await _bankConnectionRepository.AddBankConnectionAsync(connection);
         await SyncTransactionsAsync(connection);
         
         return connection;
-    }
-    
-    public async Task ResyncTransactionsAsync(BankConnection bankConnection)
-    {
-        var existing = _context.Transactions.Where(t => t.BankConnectionId == bankConnection.Id);
-        _context.Transactions.RemoveRange(existing);
-        await _context.SaveChangesAsync();
-
-        await SyncTransactionsAsync(bankConnection);
     }
     
     public override async Task SyncTransactionsAsync(BankConnection connection)

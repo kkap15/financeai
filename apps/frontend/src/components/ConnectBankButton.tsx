@@ -1,6 +1,5 @@
 'use client'
 
-import { load } from "next/dist/compiled/@edge-runtime/primitives/load";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react"
 import { PlaidLinkOnSuccess, PlaidLinkOnSuccessMetadata, usePlaidLink } from "react-plaid-link";
@@ -83,26 +82,26 @@ export default function ConnectBankButton() {
         </button>
           
         {showOptions && (
-          <div className="absolute top-full mt-2 left-0 bg-gray-800 border border-gray-700 rounded-xl shadow-xl overflow-hidden z-10 min-w-64">
+          <div className="absolute top-full mt-2 left-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl overflow-hidden z-10 min-w-64">
             <button
               onClick={connectBasiq}
-              className="w-full text-left px-5 py-4 hover:bg-gray-700 transition-center gap-3"
+              className="w-full text-left px-5 py-4 hover:bg-gray-100 dark:hover:bg-gray-700 transition flex items-center gap-3"
               >
                 <span className="text-xl">🇦🇺</span>
                   <div>
-                    <p className="text-white font-medium text-sm">Australian Bank</p>
-                    <p className="text-gray-400 text-xs">CommBank, ANZ, Westpac, NAB and more</p>
+                    <p className="text-gray-900 dark:text-white font-medium text-sm">Australian Bank</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-xs">CommBank, ANZ, Westpac, NAB and more</p>
                   </div>
               </button>
-              <div className="border-t border-gray-700" />
-                <button 
+              <div className="border-t border-gray-200 dark:border-gray-700" />
+                <button
                   onClick={connectPlaid}
-                  className="w-full text-left px-5 py-4 hover:bg-gray-700 transition flex items-center gap-3"
+                  className="w-full text-left px-5 py-4 hover:bg-gray-100 dark:hover:bg-gray-700 transition flex items-center gap-3"
                 >
                   <span className="text-xl">🌎</span>
                     <div>
-                      <p className="text-white font-medium text-sm">International Bank</p>
-                      <p className="text-gray-400 text-xs">US, UK, Canada and more via Plaid</p>
+                      <p className="text-gray-900 dark:text-white font-medium text-sm">International Bank</p>
+                      <p className="text-gray-500 dark:text-gray-400 text-xs">US, UK, Canada and more via Plaid</p>
                     </div>
                 </button>
               </div>

@@ -108,9 +108,10 @@ public class BasiqBankService : BankServiceBase
         
         var response = await _httpClient.SendAsync(request);
         var json = await response.Content.ReadAsStringAsync();
+        response.EnsureSuccessStatusCode();
+        
         var doc = JsonDocument.Parse(json);
         var data = doc.RootElement.GetProperty("data");
-        response.EnsureSuccessStatusCode();
         var newTransactions = new List<Transaction>();
 
         foreach (var t in data.EnumerateArray())
@@ -169,9 +170,9 @@ public class BasiqBankService : BankServiceBase
         request.Content = new FormUrlEncodedContent([new KeyValuePair<string, string>("scope", "SERVER_ACCESS")]);
         
         var response = await _httpClient.SendAsync(request);
-        var json = await response.Content.ReadAsStringAsync();
         response.EnsureSuccessStatusCode();
-        
+
+        var json = await response.Content.ReadAsStringAsync();
         var doc = JsonDocument.Parse(json);
         
         return doc.RootElement.GetProperty("access_token").ToString();

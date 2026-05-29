@@ -26,7 +26,7 @@ export default function FreePanel() {
                     { feature: 'Semantic transaction search', free: false, pro: true },
                     { feature: 'Budget Tracking', free: false, pro: true }
                 ].map(({ feature, free, pro }) => (
-                    <div key={feature} className="flex items-center justify-between py2 border-b border-gray-100 dark:border-gray-700">
+                    <div key={feature} className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700">
                         <span className="text-gray-700 dark:text-gray-300 text-sm">{feature}</span>
                         <div className="flex gap-8">
                             <span className="text-sm w-12 text-center">

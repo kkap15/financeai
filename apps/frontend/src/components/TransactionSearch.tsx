@@ -22,7 +22,7 @@ export default function TransactionSearch() {
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6 mb-8">
-      <h2 className="text-lg text-white font-semibold mb-4">🔍 Smart Search</h2>
+      <h2 className="text-lg text-gray-900 dark:text-white font-semibold mb-4">🔍 Smart Search</h2>
       <div className="flex gap-3">
         <input
           type="text"

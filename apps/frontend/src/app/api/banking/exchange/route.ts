@@ -1,5 +1,4 @@
 import { auth0 } from '@/lib/auth0'
-import { error } from 'next/dist/build/output/log';
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(req: NextRequest) {
