@@ -82,7 +82,12 @@ export default function ConnectBankButton() {
         </button>
           
         {showOptions && (
-          <div className="absolute top-full mt-2 left-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl overflow-hidden z-10 min-w-64">
+          <>
+            <div
+              className="fixed inset-0 z-40"
+              onClick={() => setShowOptions(false)}
+            />
+          <div className="absolute top-full mt-2 left-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl overflow-hidden z-50 min-w-64">
             <button
               onClick={connectBasiq}
               className="w-full text-left px-5 py-4 hover:bg-gray-100 dark:hover:bg-gray-700 transition flex items-center gap-3"
@@ -105,6 +110,7 @@ export default function ConnectBankButton() {
                     </div>
                 </button>
               </div>
+          </>
             )}
         </div>
       )
