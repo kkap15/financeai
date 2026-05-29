@@ -40,7 +40,6 @@ public class SubscriptionService
                 Email = userEmail,
                 Metadata = new Dictionary<string, string> { { "UserId", userId.ToString() } }
             });
-            Console.WriteLine($"Created stripe customer: {customer.Id}");
             customerId = customer.Id;
         }
 
@@ -111,12 +110,10 @@ public class SubscriptionService
         try
         { 
            var  stripeEvent = EventUtility.ConstructEvent(payload, stripeSignature, webHookSecret);
-           Console.WriteLine($"Stripe event type: {stripeEvent.Type}");
             switch (stripeEvent.Type)
             {
                 case EventTypes.CustomerSubscriptionCreated:
                 {
-                    Console.WriteLine("inside customer sub");
                     var (subscription, dbSubscription) =
                         await StripeSubscriptionHelper.GetSubscriptionData(_context, stripeEvent);
                     

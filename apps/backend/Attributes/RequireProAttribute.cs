@@ -1,6 +1,6 @@
 using FinanceAI.Api.Data;
-using FinanceAI.Api.Enums;
 using FinanceAI.Api.Helpers;
+using FinanceAI.Api.Modules.Subscriptions.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 

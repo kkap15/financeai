@@ -1,8 +1,11 @@
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using Azure;
 using Azure.AI.OpenAI;
 using FinanceAI.Api.Data;
 using FinanceAI.Api.Modules.AI.Service;
+using FinanceAI.Api.Modules.Banking.Repositories;
+using FinanceAI.Api.Modules.Banking.Services;
 using FinanceAI.Api.Modules.Budget.Services;
 using FinanceAI.Api.Modules.Chat.Services;
 using FinanceAI.Api.Modules.Chat.Tools;
@@ -23,7 +26,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -43,6 +50,12 @@ else
     connectionString = Regex.Replace(connectionString, @"\bdbname\b\s*=", "Database=", RegexOptions.IgnoreCase);
 }
 
+builder.Services.AddHttpClient("Basiq", client =>
+{
+    client.BaseAddress = new Uri("https://au-api.basiq.io");
+    client.DefaultRequestHeaders.Add("basiq-version", "3.0");
+});
+
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString, o => o.UseVector())
 );
@@ -59,12 +72,16 @@ builder.Services.AddSingleton<AzureOpenAIClient>(options =>
     var key = builder.Configuration["AzureOpenAI:Key"]!;
     return new AzureOpenAIClient(new Uri(endpoint), new AzureKeyCredential(key));
 });
+
 builder.Services.AddScoped<AIService>();
-builder.Services.AddScoped<PlaidService>();
+builder.Services.AddScoped<PlaidBankService>();
+builder.Services.AddScoped<BasiqBankService>();
+builder.Services.AddScoped<BankServiceFactory>();
 builder.Services.AddScoped<FinanceTools>();
 builder.Services.AddScoped<AgentService>();
 builder.Services.AddScoped<SubscriptionService>();
 builder.Services.AddScoped<BudgetService>();
+builder.Services.AddScoped<IBankConnectionRepository, BankConnectionRepository>();
 
 var domain = builder.Configuration["Auth0:Domain"];
 var audience = builder.Configuration["Auth0:Audience"];
@@ -104,7 +121,8 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("NextJs", policy =>
         policy.WithOrigins("http://localhost:3000", 
-                "https://financeai.moviegasm.xyz"
+                "https://financeai.moviegasm.xyz",
+                "https://consent.basiq.io"
             )
             .AllowAnyHeader()
             .AllowAnyMethod()

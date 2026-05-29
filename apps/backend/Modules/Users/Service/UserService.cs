@@ -1,6 +1,6 @@
 using FinanceAI.Api.Data;
-using FinanceAI.Api.Enums;
 using FinanceAI.Api.Models;
+using FinanceAI.Api.Modules.Subscriptions.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace FinanceAI.Api.Modules.Users.Service;

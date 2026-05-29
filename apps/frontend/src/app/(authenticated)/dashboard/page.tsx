@@ -39,7 +39,6 @@ export default async function DashboardPage({
   searchParams: Promise<{upgraded?: string}>
 }) {
     const session = await auth0.getSession();
-    console.log(session.tokenSet.accessToken);
     const { upgraded } = await searchParams;
 
     const [summary, recentTransactions] = await Promise.all([
@@ -111,7 +110,10 @@ export default async function DashboardPage({
                 <td className="p-3 sm:p-4 font-medium dark:text-white max-w-[100px] sm:max-w-none truncate">{t.description}</td>
                 <td className="p-3 sm:p-4">
                   <span className="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs px-2 py-1 rounded-full whitespace-nowrap">
-                    {t.category.replace(/_/g, ' ')}
+                    {t.category
+                    .toLowerCase()
+                    .replace(/_/g, ' ')
+                    .replace(/\b\w/g, c => c.toUpperCase())}
                   </span>
                 </td>
                 <td className="hidden sm:table-cell p-4 text-gray-500 dark:text-gray-400 text-sm">

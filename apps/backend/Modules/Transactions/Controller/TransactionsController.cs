@@ -72,7 +72,7 @@ public class TransactionsController : ControllerBase
             .AddDays(-(DateTime.UtcNow.Day - 1));
 
         var transactions = await _context.Transactions
-            .Where(t => t.UserId == user.Id && t.Date >= thisMonth)
+            .Where(t => t.UserId == user.Id)
             .ToListAsync();
         
         var summary = transactions

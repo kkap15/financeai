@@ -1,5 +1,5 @@
 using FinanceAI.Api.Data;
-using FinanceAI.Api.Enums;
+using FinanceAI.Api.Modules.Subscriptions.Enums;
 using Microsoft.EntityFrameworkCore;
 using Stripe;
 

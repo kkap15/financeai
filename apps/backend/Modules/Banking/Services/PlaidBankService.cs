@@ -1,6 +1,8 @@
 using Azure.AI.OpenAI;
 using FinanceAI.Api.Data;
 using FinanceAI.Api.Models;
+using FinanceAI.Api.Modules.Banking.Models;
+using FinanceAI.Api.Modules.Banking.Repositories;
 using Going.Plaid;
 using Going.Plaid.Entity;
 using Going.Plaid.Item;
@@ -10,27 +12,24 @@ using Microsoft.EntityFrameworkCore;
 using Pgvector;
 using Transaction = FinanceAI.Api.Models.Transaction;
 
-namespace FinanceAI.Api.Modules.Plaid.Service;
+namespace FinanceAI.Api.Modules.Banking.Services;
 
-public class PlaidService
+public class PlaidBankService : BankServiceBase
 {
-    private readonly PlaidClient _client;
-    private readonly AppDbContext _context;
-    private readonly ILogger<PlaidService> _logger;
-    private readonly IConfiguration _configuration;
-    private readonly AzureOpenAIClient _azureOpenAiClient;
+    private readonly PlaidClient _plaidClient;
+    private readonly ILogger<PlaidBankService> _logger;
+    private readonly IBankConnectionRepository _bankConnectionRepository;
 
-    public PlaidService(PlaidClient client, AppDbContext context, ILogger<PlaidService> logger,
-        IConfiguration configuration, AzureOpenAIClient azureOpenAiClient)
+    public PlaidBankService(PlaidClient plaidClient, AppDbContext context, IConfiguration configuration,
+        ILogger<PlaidBankService> logger, AzureOpenAIClient azureOpenAiClient,
+        IBankConnectionRepository bankConnectionRepository) : base(context, azureOpenAiClient, configuration)
     {
-        _client = client;
-        _context = context;
+        _plaidClient = plaidClient;
         _logger = logger;
-        _configuration = configuration;
-        _azureOpenAiClient = azureOpenAiClient;
+        _bankConnectionRepository = bankConnectionRepository;
     }
 
-    public async Task<string> CreateLinkTokenAsync(Guid userId)
+    public override async Task<LinkDataResponse> GetLinkDataAsync(Guid userId, string email)
     {
         var request = new LinkTokenCreateRequest
         {
@@ -44,21 +43,25 @@ public class PlaidService
             Language = Language.English
         };
         
-        var response = await _client.LinkTokenCreateAsync(request);
-        
-        return response.LinkToken;
+        var response = await _plaidClient.LinkTokenCreateAsync(request);
+
+        return new LinkDataResponse
+        {
+            LinkToken = response.LinkToken,
+            Provider = BankProvider.Plaid
+        };
     }
 
-    public async Task<PlaidConnection> ExchangeTokenAsync(Guid userId, string publicToken, string institutionName)
+    public override async Task<BankConnection> ExchangeTokenAsync(Guid userId, string publicToken, string institutionName)
     {
         var exchangeRequest = new ItemPublicTokenExchangeRequest
         {
             PublicToken = publicToken
         };
         
-        var exchangeResponse = await _client.ItemPublicTokenExchangeAsync(exchangeRequest);
+        var exchangeResponse = await _plaidClient.ItemPublicTokenExchangeAsync(exchangeRequest);
 
-        var connection = new PlaidConnection
+        var connection = new BankConnection
         {
             Id = Guid.NewGuid(),
             UserId = userId,
@@ -68,34 +71,29 @@ public class PlaidService
             LastSynced = DateTime.UtcNow
         };
         
-        await _context.PlaidConnections.AddAsync(connection);
-        await _context.SaveChangesAsync();
-        
+        await _bankConnectionRepository.AddBankConnectionAsync(connection);
         await SyncTransactionsAsync(connection);
+        
         return connection;
     }
     
-    public async Task ResyncConnectionAsync(Guid connectionId, Guid userId)
+    public async Task ResyncTransactionsAsync(BankConnection bankConnection)
     {
-        var connection = await _context.PlaidConnections
-            .FirstOrDefaultAsync(c => c.Id == connectionId && c.UserId == userId)
-            ?? throw new InvalidOperationException("Connection not found.");
-
-        var existing = _context.Transactions.Where(t => t.ExternalId == connectionId.ToString());
+        var existing = _context.Transactions.Where(t => t.BankConnectionId == bankConnection.Id);
         _context.Transactions.RemoveRange(existing);
         await _context.SaveChangesAsync();
 
-        await SyncTransactionsAsync(connection);
+        await SyncTransactionsAsync(bankConnection);
     }
-
-    private async Task SyncTransactionsAsync(PlaidConnection connection)
+    
+    public override async Task SyncTransactionsAsync(BankConnection connection)
     {
         var request = new TransactionsSyncRequest
         {
             AccessToken = connection.AccessToken,
         };
         
-        var response = await _client.TransactionsSyncAsync(request);
+        var response = await _plaidClient.TransactionsSyncAsync(request);
 
         var newTransactions = new List<Transaction>();
 
@@ -109,11 +107,11 @@ public class PlaidService
             {
                 Id = Guid.NewGuid(),
                 UserId = connection.UserId,
-                ExternalId = connection.Id.ToString(),
+                ExternalId = t.TransactionId,
                 Amount = (decimal)t.Amount!,
                 Category = t.PersonalFinanceCategory?.Primary ?? "Uncategorized",
                 Date = t.Date!.Value,
-                Description = t.MerchantName ?? t.OriginalDescription ?? "Unknown",
+                Description = t.MerchantName ?? t.Name ?? t.OriginalDescription ?? "Unknown",
                 BankConnectionId = connection.Id
             });
         }
@@ -130,23 +128,5 @@ public class PlaidService
 
         _logger.LogInformation("Synced {count} transactions for connection: {connectionId}", newTransactions.Count,
             connection.Id);
-    }
-
-    private async Task GenerateEmbeddingsAsync(List<Transaction> transactions)
-    {
-        var deploymentName = _configuration["AzureOpenAI:EmbeddingDeploymentName"]!;
-        var embeddingClient = _azureOpenAiClient.GetEmbeddingClient(deploymentName);
-        
-        var texts = transactions
-            .Select(t => $"{t.Description} {t.Category.Replace("_", " ")} ${t.Amount}")
-            .ToList();
-
-        var embeddingResult = await embeddingClient.GenerateEmbeddingsAsync(texts);
-
-        for (int i = 0; i < transactions.Count; i++)
-        {
-            var vector = embeddingResult.Value[i].ToFloats().ToArray();
-            transactions[i].Embedding = new Vector(vector);
-        }
     }
 }

@@ -1,4 +1,4 @@
-namespace FinanceAI.Api.Enums;
+namespace FinanceAI.Api.Modules.Subscriptions.Enums;
 
 public enum SubscriptionStatus
 {

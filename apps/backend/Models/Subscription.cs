@@ -1,4 +1,4 @@
-using FinanceAI.Api.Enums;
+using FinanceAI.Api.Modules.Subscriptions.Enums;
 
 namespace FinanceAI.Api.Models;
 
