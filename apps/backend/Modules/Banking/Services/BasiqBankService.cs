@@ -47,7 +47,7 @@ public class BasiqBankService : BankServiceBase
         var doc = JsonDocument.Parse(json);
         var clientToken = doc.RootElement.GetProperty("access_token").ToString();
 
-        var consentUrl = $"https://consent.basiq.io/home?token={clientToken}&environment=sandbox";
+        var consentUrl = $"https://consent.basiq.io/home?token={clientToken}&environment=sandbox&action=connect";
         
         return new LinkDataResponse
         {
