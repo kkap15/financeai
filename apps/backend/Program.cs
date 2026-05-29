@@ -9,7 +9,6 @@ using FinanceAI.Api.Modules.Banking.Services;
 using FinanceAI.Api.Modules.Budget.Services;
 using FinanceAI.Api.Modules.Chat.Services;
 using FinanceAI.Api.Modules.Chat.Tools;
-using FinanceAI.Api.Modules.Plaid.Service;
 using FinanceAI.Api.Modules.Users.Service;
 using Going.Plaid;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

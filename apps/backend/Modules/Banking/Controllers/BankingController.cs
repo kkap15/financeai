@@ -3,7 +3,6 @@ using FinanceAI.Api.Helpers;
 using FinanceAI.Api.Modules.Banking.Models;
 using FinanceAI.Api.Modules.Banking.Repositories;
 using FinanceAI.Api.Modules.Banking.Services;
-using FinanceAI.Api.Modules.Plaid.Controllers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
