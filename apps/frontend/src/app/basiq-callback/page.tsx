@@ -1,6 +1,8 @@
 import { Suspense } from "react";
 import BasiqCallbackInner from "./BasiqCallbackInner";
 
+export const dynamic = 'force-dynamic';
+
 export default function BasiqCallbackPage() {
     return (
         <Suspense fallback = {
