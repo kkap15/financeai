@@ -7,6 +7,7 @@ export const metadata : Metadata = {
   description: 'AI-powered personal finance dashboard',
   manifest: '/manifest.json',
   icons: {
+    icon: '/favicon.ico',
     apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
   },
   appleWebApp: {
