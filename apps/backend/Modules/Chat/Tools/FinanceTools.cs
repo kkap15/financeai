@@ -151,9 +151,9 @@ public class FinanceTools
         var normalizedCategory = CategoryHelper.NormalizeCategory(category);
         
         var userHasBudget = await _context.Budgets
-            .Where(x => x.User.Id.Equals(_userId)
+            .Where(x => x.User.Id == _userId
                         && x.Month.Equals(currentMonth)
-                        && x.Category.Equals(normalizedCategory))
+                        && x.Category.ToLower().Equals(normalizedCategory.ToLower()))
             .ToListAsync();
 
         if (userHasBudget.Any())
@@ -169,10 +169,10 @@ public class FinanceTools
         {
             var budget = new Models.Budget
             {
-                Category = category,
+                Category = normalizedCategory,
                 Id = Guid.NewGuid(),
                 UserId = _userId,
-                Month = DateOnly.FromDateTime(DateTime.UtcNow),
+                Month = currentMonth,
                 MonthlyLimit = limit
             };
 

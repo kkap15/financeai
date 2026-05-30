@@ -30,7 +30,9 @@ public class BudgetService
         {
             b.Category,
             Limit = b.MonthlyLimit,
-            Spent = actualSpending.FirstOrDefault(a => a.Category == b.Category)?.Sum ?? 0
+            Spent = actualSpending
+                .FirstOrDefault(a => string.Equals(a.Category == b.Category, StringComparison.OrdinalIgnoreCase))
+                ?.Sum ?? 0
         }).Select(x => new BudgetSummary(
             x.Category,
             x.Limit,
