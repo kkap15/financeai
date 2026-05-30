@@ -1,6 +1,6 @@
 {
   "name": "FinanceAI",
-  "short_name": "FinanceAI",
+  "short_name": "F.AI",
   "description": "AI-powered personal finance dashboard",
   "start_url": "/",
   "display": "standalone",
