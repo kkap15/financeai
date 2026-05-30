@@ -106,7 +106,7 @@ public class SubscriptionService
 
     public async Task HandleWebhook(string payload, string stripeSignature)
     {
-        var webHookSecret = _configuration["Stripe:WebhookSecret"]!;
+        var webHookSecret = _configuration["Stripe:WebhookSecret"];
         try
         { 
            var  stripeEvent = EventUtility.ConstructEvent(payload, stripeSignature, webHookSecret);
@@ -146,9 +146,9 @@ public class SubscriptionService
                 }
             }
         }
-        catch (StripeException e)
+        catch (StripeException)
         {
-            throw new InvalidOperationException($"Webhook error: {e.Message}", e);
+            throw;
         }
     }
 }

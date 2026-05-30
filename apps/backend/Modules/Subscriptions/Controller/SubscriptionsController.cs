@@ -65,14 +65,23 @@ public class SubscriptionsController : ControllerBase
     }
 
     [HttpPost("webhook")]
+    [AllowAnonymous]
     public async Task<IActionResult> WebhookAsync()
     {
-        using var reader = new StreamReader(Request.Body);
+        Request.EnableBuffering();
+        using var reader = new StreamReader(Request.Body, leaveOpen: true);
         var payload = await reader.ReadToEndAsync();
         var stripeSignature = Request.Headers["Stripe-Signature"].ToString();
-        
-        await _subscriptionService.HandleWebhook(payload, stripeSignature);
-        
+
+        try
+        {
+            await _subscriptionService.HandleWebhook(payload, stripeSignature);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+
         return Ok();
     }
 }
