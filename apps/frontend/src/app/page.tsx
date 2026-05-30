@@ -18,17 +18,18 @@ export default async function HomePage() {
           --accent: #3B82F6; --accent2: #8B5CF6; --green: #10B981;
         }
         .logo { font-family: 'Syne', sans-serif; font-size: 1.25rem; font-weight: 700; background: linear-gradient(135deg, #3B82F6, #8B5CF6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        nav { 
-          display: flex; 
-          align-items: center; 
-          justify-content: space-between; 
-          padding: 1.25rem 3rem; 
-          border-bottom: 1px solid var(--border); 
-          position: sticky; 
-          top: 0; 
-          background: rgba(8,12,20,0.85); 
-          backdrop-filter: blur(12px); 
-          z-index: 100; 
+        nav {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 1.25rem 3rem;
+          padding-top: calc(1.25rem + env(safe-area-inset-top));
+          border-bottom: 1px solid var(--border);
+          position: sticky;
+          top: 0;
+          background: rgba(8,12,20,0.85);
+          backdrop-filter: blur(12px);
+          z-index: 100;
         }
         .nav-links { display: flex; gap: 2rem; align-items: center; }
         .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
@@ -65,7 +66,7 @@ export default async function HomePage() {
         .pricing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 3.5rem; }
         @media (max-width: 640px) {
           .pricing-grid { grid-template-columns: 1fr; }
-          nav { padding: 1rem 1.5rem; }
+          nav { padding: 1rem 1.5rem; padding-top: calc(1rem + env(safe-area-inset-top)); }
           .nav-links a:not(.nav-cta) { display: none; }
           .nav-cta { padding: 0.4rem 1rem; font-size: 0.8rem; }
           .hero { padding: 3rem 1.5rem 4rem; }
