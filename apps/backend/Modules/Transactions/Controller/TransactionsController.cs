@@ -67,15 +67,15 @@ public class TransactionsController : ControllerBase
     {
         var user = await ControllerHelper.GetCurrentUserAsync(User, _context);
         if (user is null) return Unauthorized();
-        
-        var thisMonth = DateOnly.FromDateTime(DateTime.UtcNow)
-            .AddDays(-(DateTime.UtcNow.Day - 1));
 
         var transactions = await _context.Transactions
             .Where(t => t.UserId == user.Id)
             .ToListAsync();
+
+        if (!transactions.Any()) return Ok(null);
         
         var summary = transactions
+            .Where(t => t.Amount > 0)
             .GroupBy(x => x.Category)
             .Select(t => new
             {
