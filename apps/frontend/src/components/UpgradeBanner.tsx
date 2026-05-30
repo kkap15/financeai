@@ -6,10 +6,31 @@ export default function UpgradeBanner() {
     const router = useRouter()
 
     useEffect(() => {
-        const timer = setTimeout(() => {
-            router.replace('/dashboard')
-        }, 5000)
-        return () => clearTimeout(timer)
+        let attempts = 0
+        const maxAttempts = 12
+
+        const poll = setInterval(async () => {
+            attempts++
+            try {
+                const res = await fetch('/api/user/subscription')
+                if (res.ok) {
+                    const data = await res.json()
+                    if (data.tier === 'Pro') {
+                        clearInterval(poll)
+                        router.refresh()
+                        router.replace('/dashboard')
+                        return
+                    }
+                }
+            } catch {}
+
+            if (attempts >= maxAttempts) {
+                clearInterval(poll)
+                router.replace('/dashboard')
+            }
+        }, 2500)
+
+        return () => clearInterval(poll)
     }, [router])
 
     return (
@@ -18,7 +39,7 @@ export default function UpgradeBanner() {
             <div>
                 <p className="font-semibold text-green-500">Welcome to Pro!</p>
                 <p className="text-green-600 dark:text-green-400 text-sm">
-                    You now have access to all Pro features.
+                    Activating your subscription…
                 </p>
             </div>
         </div>

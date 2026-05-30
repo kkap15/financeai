@@ -65,10 +65,8 @@ public class SubscriptionsController : ControllerBase
     }
 
     [HttpPost("webhook")]
-    [AllowAnonymous]
     public async Task<IActionResult> WebhookAsync()
     {
-        Request.EnableBuffering();
         using var reader = new StreamReader(Request.Body, leaveOpen: true);
         var payload = await reader.ReadToEndAsync();
         var stripeSignature = Request.Headers["Stripe-Signature"].ToString();

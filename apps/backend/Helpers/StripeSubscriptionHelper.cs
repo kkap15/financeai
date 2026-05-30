@@ -33,15 +33,17 @@ public static class StripeSubscriptionHelper
         return (subscription, dbSubscription);
     }
 
+    private static DateTime? GetPeriodEnd(Subscription stripeSubscription)
+        => stripeSubscription.Items?.Data?.FirstOrDefault()?.CurrentPeriodEnd;
+
     public static async Task CreateNewSubscription(Subscription stripeSubscription, Models.Subscription dbSubscription,
         AppDbContext context)
     {
-        
-        dbSubscription.CurrentPeriodEnd = stripeSubscription.BillingCycleAnchor;
+        dbSubscription.CurrentPeriodEnd = GetPeriodEnd(stripeSubscription);
         dbSubscription.Status = SubscriptionStatus.Active;
         dbSubscription.Tier = SubscriptionTier.Pro;
         dbSubscription.StripeSubscriptionId = stripeSubscription.Id;
-                    
+
         context.Subscriptions.Update(dbSubscription);
         await context.SaveChangesAsync();
     }
@@ -52,18 +54,23 @@ public static class StripeSubscriptionHelper
         if (stripeSubscription.CancelAtPeriodEnd)
         {
             dbSubscription.Status = SubscriptionStatus.Cancelled;
-            dbSubscription.CurrentPeriodEnd = stripeSubscription.BillingCycleAnchor;
+            dbSubscription.CurrentPeriodEnd = GetPeriodEnd(stripeSubscription);
             await context.SaveChangesAsync();
             return;
         }
-        
+
+        dbSubscription.CurrentPeriodEnd = GetPeriodEnd(stripeSubscription);
+        dbSubscription.StripeSubscriptionId = stripeSubscription.Id;
         dbSubscription.Status = stripeSubscription.Status switch
         {
             "active"   => SubscriptionStatus.Active,
             "past_due" => SubscriptionStatus.PastDue,
             _          => SubscriptionStatus.Active
         };
-                    
+
+        if (stripeSubscription.Status == "active")
+            dbSubscription.Tier = SubscriptionTier.Pro;
+
         context.Subscriptions.Update(dbSubscription);
         await context.SaveChangesAsync();
     }

@@ -12,6 +12,7 @@ export async function GET() {
         headers: {
             Authorization: `Bearer ${session.tokenSet.accessToken}`
         },
+        cache: 'no-store',
     })
     
     if (!response.ok) {

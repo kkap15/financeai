@@ -2,6 +2,7 @@ import CategoryChart from "@/components/Category/CategoryChart";
 import ConnectBankButton from "@/components/ConnectBankButton";
 import UpgradeBanner from "@/components/UpgradeBanner";
 import { auth0 } from "@/lib/auth0";
+import { redirect } from "next/navigation";
 import { Transaction } from "../../../types/Transaction"
 
 async function getSummary(accessToken: string) {
@@ -52,11 +53,12 @@ export default async function DashboardPage({
     searchParams: Promise<{ upgraded?: string }>
 }) {
     const session = await auth0.getSession();
+    if (!session) redirect('/auth/login');
     const { upgraded } = await searchParams;
 
     const [summary, recentTransactions] = await Promise.all([
-        getSummary(session!.tokenSet.accessToken!),
-        getRecentTransactions(session!.tokenSet.accessToken!)
+        getSummary(session.tokenSet.accessToken!),
+        getRecentTransactions(session.tokenSet.accessToken!)
     ]);
 
     const netFlow = summary ? Math.abs(summary.totalIncome) - summary.totalSpent : 0;

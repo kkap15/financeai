@@ -1,10 +1,12 @@
 import FreePanel from "@/components/FreePanel";
 import ProPanel from "@/components/ProPanel";
 import { auth0 } from "@/lib/auth0";
+import { redirect } from "next/navigation";
 
 export default async function SettingsPage() {
     const session = await auth0.getSession();
-    const accessToken = session!.tokenSet.accessToken!
+    if (!session) redirect('/auth/login');
+    const accessToken = session.tokenSet.accessToken!
 
     const response = await fetch(`${process.env.API_URL}/api/user/subscription`, {
         headers: { Authorization: `Bearer ${accessToken}` },

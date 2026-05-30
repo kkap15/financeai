@@ -3,6 +3,8 @@ import Navbar from "@/components/Navbar";
 import { auth0 } from "@/lib/auth0"
 import { redirect } from "next/navigation";
 
+export const dynamic = 'force-dynamic';
+
 
 async function getSubscription(accessToken:string) {
     const res = await fetch(`${process.env.API_URL}/api/user/subscription`, {

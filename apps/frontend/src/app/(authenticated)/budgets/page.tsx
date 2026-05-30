@@ -1,5 +1,6 @@
 import BudgetForm from '@/components/BudgetForm';
 import { auth0 } from '@/lib/auth0';
+import { redirect } from 'next/navigation';
 import { Budget } from '../../../types/Budget'
 
 async function getBudgets(accessToken: string): Promise<Budget[]> {
@@ -28,7 +29,8 @@ function getPercentageColor(percentage: number) {
 
 export default async function BudgetPage() {
     const session = await auth0.getSession();
-    const budgets = await getBudgets(session!.tokenSet.accessToken);
+    if (!session) redirect('/auth/login');
+    const budgets = await getBudgets(session.tokenSet.accessToken);
 
     return (
         <>

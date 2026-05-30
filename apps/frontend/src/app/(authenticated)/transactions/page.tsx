@@ -1,5 +1,6 @@
 import TransactionSearch from "@/components/TransactionSearch";
 import { auth0 } from "@/lib/auth0";
+import { redirect } from "next/navigation";
 import { Transaction } from '../../../types/Transaction'
 
 async function getSubscription(accessToken: string) {
@@ -34,10 +35,11 @@ export default async function TransactionsPage({
     searchParams: Promise<{ page?: string }>
 }) {
     const session = await auth0.getSession();
+    if (!session) redirect('/auth/login');
     const { page: pageParam } = await searchParams;
     const page = parseInt(pageParam ?? '1');
-    const { transactions, total, totalPages } = await getTransactions(session!.tokenSet.accessToken!, page);
-    const subscription = await getSubscription(session!.tokenSet.accessToken!);
+    const { transactions, total, totalPages } = await getTransactions(session.tokenSet.accessToken!, page);
+    const subscription = await getSubscription(session.tokenSet.accessToken!);
     const isPro = subscription?.tier === 'Pro';
 
     return (
