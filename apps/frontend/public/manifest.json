@@ -4,8 +4,9 @@
   "description": "AI-powered personal finance dashboard",
   "start_url": "/",
   "display": "standalone",
+  "display-override": ["standalone"],
   "background_color": "#080C14",
-  "theme_color": "#3B82F6",
+  "theme_color": "#080C14",
   "orientation": "portrait",
   "icons": [
     {

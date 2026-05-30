@@ -32,6 +32,8 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
+      <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+      <meta name="apple-mobile-app-capsule" content="yes" />
       <body style={{ fontFamily: "'DM Sans', sans-serif" }}>
         <ThemeProvider>{children}</ThemeProvider>
       </body>

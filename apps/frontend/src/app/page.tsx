@@ -6,7 +6,7 @@ export default async function HomePage() {
   if (session) redirect('/dashboard')
 
   return (
-    <main style={{ background: '#080C14', minHeight: '100vh', color: '#F0F4FF', fontFamily: "'DM Sans', sans-serif", overflowX: 'hidden' }}>
+    <main style={{ background: '#080C14', minHeight: '100vh', color: '#F0F4FF', fontFamily: "'DM Sans', sans-serif", overflowX: 'hidden'}}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -22,10 +22,10 @@ export default async function HomePage() {
           display: flex; 
           align-items: center; 
           justify-content: space-between; 
-          padding: max(1.25rem, env(safe-area-insert-top)) max(3rem, env(safe-area-insert-right)) 1.25rem max(3rem, env(safe-area-insert-left)); 
+          padding: 1.25rem 3rem; 
           border-bottom: 1px solid var(--border); 
           position: sticky; 
-          top: 0;
+          top: 0; 
           background: rgba(8,12,20,0.85); 
           backdrop-filter: blur(12px); 
           z-index: 100; 
@@ -65,8 +65,9 @@ export default async function HomePage() {
         .pricing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 3.5rem; }
         @media (max-width: 640px) {
           .pricing-grid { grid-template-columns: 1fr; }
-          nav { padding: max(1rem, env(safe-area-insert-top)) max(1.5rem, env(safe-area-insert-right)) 1 rem max(1.5rem, env(safe-area-insert-left)); }
+          nav { padding: 1rem 1.5rem; }
           .nav-links a:not(.nav-cta) { display: none; }
+          .nav-cta { padding: 0.4rem 1rem; font-size: 0.8rem; }
           .hero { padding: 3rem 1.5rem 4rem; }
           .stats { gap: 1.5rem; }
           footer { padding: 2rem 1.5rem; }
