@@ -1,5 +1,6 @@
 using Azure.AI.OpenAI;
 using FinanceAI.Api.Data;
+using FinanceAI.Api.Helpers;
 using FinanceAI.Api.Models;
 using FinanceAI.Api.Modules.Banking.Models;
 using FinanceAI.Api.Modules.Banking.Repositories;
@@ -101,7 +102,7 @@ public class PlaidBankService : BankServiceBase
                 UserId = connection.UserId,
                 ExternalId = t.TransactionId,
                 Amount = (decimal)t.Amount!,
-                Category = t.PersonalFinanceCategory?.Primary ?? "Uncategorized",
+                Category = CategoryHelper.NormalizeCategory(t.PersonalFinanceCategory?.Primary ?? "Uncategorized"),
                 Date = t.Date!.Value,
                 Description = t.MerchantName ?? t.Name ?? t.OriginalDescription ?? "Unknown",
                 BankConnectionId = connection.Id

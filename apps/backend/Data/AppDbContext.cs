@@ -12,7 +12,6 @@ public class AppDbContext : DbContext
 
     public DbSet<User> Users => Set<User>();
     public DbSet<Subscription> Subscriptions => Set<Subscription>();
-    public DbSet<PlaidConnection> PlaidConnections => Set<PlaidConnection>();
     public DbSet<Transaction> Transactions => Set<Transaction>();
     public DbSet<Budget> Budgets => Set<Budget>();
     public DbSet<BankConnection> BankConnections => Set<BankConnection>();

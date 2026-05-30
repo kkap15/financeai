@@ -1,10 +1,9 @@
-using System.Globalization;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using Azure.AI.OpenAI;
 using FinanceAI.Api.Data;
-using FinanceAI.Api.Models;
+using FinanceAI.Api.Helpers;
 using FinanceAI.Api.Modules.Banking.Models;
 using FinanceAI.Api.Modules.Banking.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +15,7 @@ public class BasiqBankService : BankServiceBase
     private readonly ILogger<BasiqBankService> _logger;
     private readonly IBankConnectionRepository _bankConnectionRepository;
     private readonly HttpClient _httpClient;
+    private readonly string _apiKey;
     
     public BasiqBankService(IConfiguration configuration, AppDbContext context, ILogger<BasiqBankService> logger,
         AzureOpenAIClient azureOpenAiClient, IBankConnectionRepository bankConnectionRepository,
@@ -24,17 +24,16 @@ public class BasiqBankService : BankServiceBase
         _logger = logger;
         _bankConnectionRepository = bankConnectionRepository;
         _httpClient = httpClientFactory.CreateClient("Basiq");
+        _apiKey = _configuration["Basiq:ApiKey"];
     }
 
     public override async Task<LinkDataResponse> GetLinkDataAsync(Guid userId, string email)
     {
-        var serverToken = await GetServerToken();
+        var serverToken = await BankServiceHelper.GetServerToken(_httpClient, _apiKey);
         var basiqUserId = await GetOrCreateBasiqUserAsync(userId, email, serverToken);
-
-        var apiKey = _configuration["Basiq:ApiKey"]!;
         
         var request = new HttpRequestMessage(HttpMethod.Post, "/token");
-        request.Headers.Authorization = new AuthenticationHeaderValue("Basic", apiKey);
+        request.Headers.Authorization = new AuthenticationHeaderValue("Basic", _apiKey);
         request.Content = new FormUrlEncodedContent([
             new KeyValuePair<string, string>("scope", "CLIENT_ACCESS"),
             new KeyValuePair<string, string>("userId", basiqUserId)
@@ -59,7 +58,7 @@ public class BasiqBankService : BankServiceBase
 
     public override async Task<BankConnection> ExchangeTokenAsync(Guid userId, string jobId, string institutionName)
     {
-        var jobDoc = await PollJobsAsync(jobId);
+        var jobDoc = await BankServiceHelper.PollJobsAsync(_httpClient, _apiKey, jobId);
         if (jobDoc is null) throw new Exception("Basiq jobs did not complete in time.");
 
         var sourceUrl = jobDoc.RootElement
@@ -89,17 +88,17 @@ public class BasiqBankService : BankServiceBase
         };
         
         connection = await _bankConnectionRepository.AddBankConnectionAsync(connection);
-        await SyncTransactionsAsync(connection, transactionUrl);
+        await SyncBasiqTransactionsAsync(connection, transactionUrl);
         
         return connection;
     }
 
     public override async Task SyncTransactionsAsync(BankConnection connection)
-        => await SyncTransactionsAsync(connection, null);
+        => await SyncBasiqTransactionsAsync(connection, null);
     
-    private async Task SyncTransactionsAsync(BankConnection connection, string? transactionUrl)
+    private async Task SyncBasiqTransactionsAsync(BankConnection connection, string? transactionUrl)
     {
-        var token = await GetServerToken();
+        var token = await BankServiceHelper.GetServerToken(_httpClient, _apiKey);
 
         var url = transactionUrl ?? $"/users/{connection.BasiqUserId}/transactions?limit=500";
 
@@ -112,118 +111,50 @@ public class BasiqBankService : BankServiceBase
         
         var doc = JsonDocument.Parse(json);
         var data = doc.RootElement.GetProperty("data");
-        var newTransactions = new List<Transaction>();
 
-        foreach (var t in data.EnumerateArray())
+        var transactions = await BankServiceHelper.GetNewTransactionsFromBasiqData(data, _context, connection);
+        
+        if (transactions.Any())
         {
-            var externalId = t.TryGetProperty("id", out var idProp) ? idProp.GetString() : null;
-            if (string.IsNullOrEmpty(externalId)) continue;
-            
-            var exists = await _context.Transactions
-                .AnyAsync(x => x.ExternalId == externalId);
-            if (exists) continue;
-
-            var amountStr = t.TryGetProperty("amount", out var amountProp) ? amountProp.GetString() ?? "0" : "0";
-            var amount = decimal.Parse(amountStr, CultureInfo.InvariantCulture);
-
-            var postDateStr = t.TryGetProperty("postDate", out var dateProp) ?  dateProp.GetString() : null;
-            if (string.IsNullOrEmpty(postDateStr)) continue;
-            var postDate = DateTime.Parse(postDateStr, CultureInfo.InvariantCulture);
-
-            var description = t.TryGetProperty("description", out var descProp)
-                ? descProp.GetString() ?? "Unknown"
-                : "Unknown";
-            
-            var category = t.TryGetProperty("class", out var catProp)
-                ? catProp.GetString() ?? "Uncategorized" : "Uncategorized";
-            
-            newTransactions.Add(new Transaction
-            {
-                Amount = Math.Abs(amount),
-                BankConnectionId = connection.Id,
-                Category = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(category.ToLower()),
-                Date = DateOnly.FromDateTime(postDate),
-                Description = description,
-                Id = Guid.NewGuid(),
-                ExternalId = externalId,
-                UserId = connection.UserId
-            });
-        }
-
-        if (newTransactions.Any())
-        {
-            await GenerateEmbeddingsAsync(newTransactions);
-            await _context.Transactions.AddRangeAsync(newTransactions);
+            await GenerateEmbeddingsAsync(transactions);
+            await _context.Transactions.AddRangeAsync(transactions);
             await _context.SaveChangesAsync();
         }
 
-        _logger.LogInformation("Synced {count} transactions for connection: {connectionId}", newTransactions.Count,
+        _logger.LogInformation("Synced {count} transactions for connection: {connectionId}", transactions.Count,
             connection.UserId);
-    }
-
-    private async Task<string> GetServerToken()
-    {
-        var apiKey = _configuration["Basiq:ApiKey"]!;
-
-        var request = new HttpRequestMessage(HttpMethod.Post, "/token");
-        request.Headers.Authorization = new AuthenticationHeaderValue("Basic", apiKey);
-        request.Content = new FormUrlEncodedContent([new KeyValuePair<string, string>("scope", "SERVER_ACCESS")]);
-        
-        var response = await _httpClient.SendAsync(request);
-        response.EnsureSuccessStatusCode();
-
-        var json = await response.Content.ReadAsStringAsync();
-        var doc = JsonDocument.Parse(json);
-        
-        return doc.RootElement.GetProperty("access_token").ToString();
     }
 
     private async Task<string> GetOrCreateBasiqUserAsync(Guid userId, string email, string serverToken)
     {
-        var existing = await _bankConnectionRepository.GetUserByIdAsync(userId, BankProvider.Basiq);
-        if (existing?.BasiqUserId is not null) return existing.BasiqUserId;
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+        
+        if (!string.IsNullOrEmpty(user?.BasiqUserId)) return user.BasiqUserId;
+        
 
         var request = new HttpRequestMessage(HttpMethod.Post, "/users");
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", serverToken);
-        request.Content = new StringContent(JsonSerializer.Serialize(new { email, mobile="+61412345678" }), Encoding.UTF8, "application/json");
+        request.Content = new StringContent(
+            JsonSerializer.Serialize(new
+            {
+                email,
+                mobile = BankServiceHelper.GenerateAustralianMobile()
+            }),
+            Encoding.UTF8, "application/json");
 
         var response = await _httpClient.SendAsync(request);
         response.EnsureSuccessStatusCode();
 
         var json = await response.Content.ReadAsStringAsync();
         var doc = JsonDocument.Parse(json);
-        return doc.RootElement.GetProperty("id").ToString()!;
-    }
+        var basiqUserId = doc.RootElement.GetProperty("id").ToString()!;
 
-    private async Task<JsonDocument?> PollJobsAsync(string jobId)
-    {
-        var token = await GetServerToken();
-
-        for (var i = 0; i < 20; ++i)
-        {   
-            var request = new HttpRequestMessage(HttpMethod.Get, $"/jobs/{jobId}");
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-            var response = await _httpClient.SendAsync(request);
-            var json = await response.Content.ReadAsStringAsync();
-
-            var doc = JsonDocument.Parse(json);
-
-            if (doc.RootElement.TryGetProperty("steps", out var steps))
-            {
-                var stepList = steps.EnumerateArray().ToList();
-
-                var allDone = stepList.All(s =>
-                {
-                    var status = s.GetProperty("status").GetString();
-                    return status == "success";
-                });
-
-                if (allDone) return doc;
-            }
-            await Task.Delay(2000);
+        if (user is not null)
+        {
+            user.BasiqUserId = basiqUserId;
+            await _context.SaveChangesAsync();
         }
         
-        return null;
+        return basiqUserId;
     }
 }

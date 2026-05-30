@@ -1,4 +1,5 @@
 using FinanceAI.Api.Data;
+using FinanceAI.Api.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 namespace FinanceAI.Api.Modules.Budget.Services;
@@ -44,7 +45,7 @@ public class BudgetService
         decimal limit)
     {
         var currentMonth = new DateOnly(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1);
-        var normalizedCategory = category.ToUpperInvariant().Replace(" ", "_");
+        var normalizedCategory = CategoryHelper.NormalizeCategory(category);
         
         var userHasBudget = await context.Budgets
             .Where(x => x.User.Id.Equals(userId)
@@ -73,7 +74,7 @@ public class BudgetService
         {
             var budget = new Models.Budget
             {
-                Category = category,
+                Category = normalizedCategory,
                 Id = Guid.NewGuid(),
                 UserId = userId,
                 Month = currentMonth,

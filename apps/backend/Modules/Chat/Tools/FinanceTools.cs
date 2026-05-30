@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Globalization;
 using Azure.AI.OpenAI;
 using FinanceAI.Api.Data;
+using FinanceAI.Api.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.SemanticKernel;
 using Pgvector;
@@ -147,11 +148,12 @@ public class FinanceTools
         [Description("The monthly spending limit in dollars")] decimal limit)
     {
         var currentMonth = new DateOnly(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1);
+        var normalizedCategory = CategoryHelper.NormalizeCategory(category);
         
         var userHasBudget = await _context.Budgets
             .Where(x => x.User.Id.Equals(_userId)
                         && x.Month.Equals(currentMonth)
-                        && x.Category.Equals(category))
+                        && x.Category.Equals(normalizedCategory))
             .ToListAsync();
 
         if (userHasBudget.Any())
@@ -161,7 +163,7 @@ public class FinanceTools
             _context.Budgets.Update(budget);
             await _context.SaveChangesAsync();
             
-            return $"Budget updated: ${limit:F2}/month for {category.Replace("_", " ")}";
+            return $"Budget updated: ${limit:F2}/month for {normalizedCategory}";
         }
         else
         {
@@ -177,7 +179,7 @@ public class FinanceTools
             _context.Budgets.Add(budget);
             await _context.SaveChangesAsync();
             
-            return $"Budget created: ${limit:F2}/month for {category.Replace("_", " ")}";
+            return $"Budget created: ${limit:F2}/month for {normalizedCategory}";
         }
     }
 
