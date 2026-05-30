@@ -24,7 +24,7 @@ public class BasiqBankService : BankServiceBase
         _logger = logger;
         _bankConnectionRepository = bankConnectionRepository;
         _httpClient = httpClientFactory.CreateClient("Basiq");
-        _apiKey = _configuration["Basiq:ApiKey"];
+        _apiKey = _configuration["Basiq:ApiKey"]!;
     }
 
     public override async Task<LinkDataResponse> GetLinkDataAsync(Guid userId, string email)

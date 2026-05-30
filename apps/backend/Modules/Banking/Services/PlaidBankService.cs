@@ -95,18 +95,20 @@ public class PlaidBankService : BankServiceBase
             var exists = await _context.Transactions.AnyAsync(x => x.ExternalId == t.TransactionId);
             
             if (exists) continue;
-            
+
+#pragma warning disable CS0612 // Type or member is obsolete
             newTransactions.Add(new Transaction
             {
                 Id = Guid.NewGuid(),
                 UserId = connection.UserId,
-                ExternalId = t.TransactionId,
+                ExternalId = t.TransactionId!,
                 Amount = (decimal)t.Amount!,
                 Category = CategoryHelper.NormalizeCategory(t.PersonalFinanceCategory?.Primary ?? "Uncategorized"),
                 Date = t.Date!.Value,
                 Description = t.MerchantName ?? t.Name ?? t.OriginalDescription ?? "Unknown",
                 BankConnectionId = connection.Id
             });
+#pragma warning restore CS0612 // Type or member is obsolete
         }
         
         if (newTransactions.Any())
